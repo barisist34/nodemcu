@@ -1,0 +1,69 @@
+
+{% extends "core/base.html" %}
+
+{% load static %}
+
+{% comment %} {% static  "js/temperature_ajax.js" %} {% endcomment %}
+{% block content %}
+
+<script src="{% static 'js/temperature_ajax.js' %}"></script>
+{% comment %} temperature_ajax.js scripti random olarak djangonun ürettiği değerleri 20 sn de dashboarddda basar. {% endcomment %}
+
+
+<div class="container">
+<h3>NODEMCU SICAKLIK TABLOSU </h3> 
+<button class="btn btn-danger">BOOTSTRAP...</button>
+
+        <div id="temperature_ajax">
+            <br><br>
+
+            <b> AJAX SICAKLIK TABLOSU</b><br>
+            <b>Kayıt Sayısı Sıcaklık: </b>{{kayit_sayisi_total_ajax}} <br>
+               <table class="table">
+              <thead>
+                 <tr>
+                   <th scope="col">id</th>
+                   <th scope="col">Cihaz Adı</th>
+                   <th scope="col">Sıcaklık</th>
+                   <th scope="col">Tarih</th>            
+                 </tr>
+               </thead>
+             <tbody>
+            
+             {% for temp in tempsajax %}
+               <tr>
+                   {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
+                 <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
+                 <td style="background-color:#FF0000">{{temp.temperature}}</td>
+                <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+                  <td style="background-color:#FF0000"> {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->        
+                       {% if temp.mailSend == False %}
+                       <td style="background-color:#FF0000"> {{temp.mailSend}}</td>
+                       {% else %}
+                       <td style="background-color:#0000FF"> {{temp.mailSend}}</td>
+                       {% endif %}
+                   
+                   {% else %}
+            
+                 <th scope="row" >{{temp.id}}</th>
+                 <td> {{temp.device_name}}</td>
+                 <td >{{temp.temperature}}</td>
+                <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+                  <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+                  
+            
+                   {% endif %}
+            
+               
+               </tr>  
+            
+             {% endfor %}
+            
+             </tbody>
+            </table>
+            <br>
+        </div>
+
+</div>
+
+{% endblock content %}

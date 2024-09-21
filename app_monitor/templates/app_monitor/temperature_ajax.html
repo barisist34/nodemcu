@@ -1,0 +1,51 @@
+
+<br><br>
+
+<b> AJAX SICAKLIK TABLOSU</b><br>
+<b>Kayıt Sayısı Sıcaklık: </b>{{kayit_sayisi_total_ajax}} <br>
+   <table class="table">
+  <thead>
+     <tr>
+       <th scope="col">id</th>
+       <th scope="col">Cihaz Adı</th>
+       <th scope="col">Cihaz ID</th>
+       <th scope="col">Sıcaklık</th>
+       <th scope="col">Nem</th>
+       <th scope="col">Voltaj</th>
+       <th scope="col">Tarih</th>
+     </tr>
+   </thead>
+ <tbody>
+
+ {% for temp in tempsajax %}
+   <tr>
+       {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
+     <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
+     <td style="background-color:#FF0000">{{temp.temperature}}</td>
+    <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+      <td style="background-color:#FF0000"> {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->        
+           {% if temp.mailSend == False %}
+           <td style="background-color:#FF0000"> {{temp.mailSend}}</td>
+           {% else %}
+           <td style="background-color:#0000FF"> {{temp.mailSend}}</td>
+           {% endif %}
+       
+       {% else %}
+
+     <th scope="row" >{{temp.id}}</th>
+     <td> <a href="/app_monitor/{{temp.device_name}}" >{{temp.device_name}}</a> </td>
+     <td> {{temp.device_id}}</td>
+     <td >{{temp.temperature}}</td>
+     <td >{{temp.humidity}}</td>
+     <td >{{temp.volcum}}</td>
+    <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+      <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+       {% endif %}
+   
+   </tr>  
+
+ {% endfor %}
+
+ </tbody>
+</table>
+<br>
