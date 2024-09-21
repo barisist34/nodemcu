@@ -74,7 +74,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
     # return render(request, 'app_monitor/temperature_ajax.html', context)
     return redirect('/app_monitor')
 
-
+# GIT commit 240921-2
 # def deviceView(request,str_device_name):
 #     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10:-1]
 #     print(f"deviceView girdi, device={str_device_name} ")
