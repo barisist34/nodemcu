@@ -3,9 +3,9 @@
 
 {% load static %}
 
-{% comment %} {% block title %}
+{% block title %}
 <title> {{device_name}} EKRANI</title>
-{% endblock title %} {% endcomment %}
+{% endblock title %} 
 
 {% comment %} {% static  "js/temperature_ajax.js" %} {% endcomment %}
 {% block content %}
@@ -15,7 +15,7 @@
 
 
 <div class="container">
-<h3>  SICAKLIK TABLOSU </h3> 
+<h3>{{device_name}} SICAKLIK TABLOSU </h3> 
 {% comment %} {% csrf_token %} {% endcomment %}
 <button class="btn btn-danger">BOOTSTRAP...</button>
 

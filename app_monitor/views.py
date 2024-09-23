@@ -85,7 +85,7 @@ def deviceView(request,str_device_name):
 
     context=dict(
         device=device,
-        # device_name=str_device_name,
+        device_name=str_device_name,
     )
     return render(request,"app_monitor/device.html",context)
 
