@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse,redirect
 from .models import Temperature
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
 
 # from django.contrib
@@ -14,18 +14,19 @@ def dashboard(request):
     print("dashboard girdi....")
     return render(request,"app_monitor/dashboard.html")
 
-@csrf_exempt
+# @csrf_exempt
+# @requires_csrf_token
 def tempList(request):
     tempsajax = Temperature.objects.order_by('-id')[:10]
     kayit_sayisi_total_ajax = Temperature.objects.count()
-
+    print("Templist girdi....")
     context=dict(
         tempsajax=tempsajax,
         kayit_sayisi_total_ajax=kayit_sayisi_total_ajax,
     )
     return render(request, 'app_monitor/temperature_ajax.html', context)
 
-@csrf_exempt
+# @csrf_exempt
 def TemperatureAddRecord(request): ####RANDOM SICAKLIK, BSC1 tabloları doldurma, form işlemi olmadan, fetchdata_perf() içinde ajax yöntemiyle.
 
     kayit = request.POST.get("SicaklikKayit")
@@ -75,12 +76,16 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
     return redirect('/app_monitor')
 
 # GIT commit 240921-2
-# def deviceView(request,str_device_name):
-#     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10:-1]
-#     print(f"deviceView girdi, device={str_device_name} ")
+# @csrf_exempt
+def deviceView(request,str_device_name):
+    device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
+    print(f"deviceView girdi, device={str_device_name} ")
+    print(f"device çıktısı: , {device} ")
+    print(f"str_device_name çıktısı: , {str_device_name} ")
 
-#     context=dict(
-#         device=device,
-#         # device_name=str_device_name,
-#     )
-#     return render(request,"app_monitor/device.html",context)
+    context=dict(
+        device=device,
+        # device_name=str_device_name,
+    )
+    return render(request,"app_monitor/device.html",context)
+

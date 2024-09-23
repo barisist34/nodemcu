@@ -3,18 +3,21 @@ function fetchdata_perf()
 {
 
     //var SicaklikKayit = 37 + Math.floor(Math.random() * 15);
-
+    // var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     $.ajax({        
               url: 'tempList',
-              type: 'POST',
-            //   type: 'GET',
+              // type: 'POST',
+              type: 'GET',
               data:{
 
               //SicaklikKayit:SicaklikKayit,
-              csrfmiddlewaretoken: '{{ csrf_token }}',
-              dataType: "json",
+              // csrfmiddlewaretoken: '{{ csrf_token }}',
+              // dataType: "json",
 
               },
+              // beforeSend: function (xhr){
+              //   xhr.setRequestHeader('X-CSRFToken', csrftoken);
+              // },
               success: function(response){
               $('#temperature_ajax').html(response);
               },

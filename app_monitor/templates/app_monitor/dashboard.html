@@ -6,12 +6,14 @@
 {% comment %} {% static  "js/temperature_ajax.js" %} {% endcomment %}
 {% block content %}
 
+{% comment %} {% csrf_token %} {% endcomment %}
 <script src="{% static 'js/temperature_ajax.js' %}"></script>
 {% comment %} temperature_ajax.js scripti random olarak djangonun ürettiği değerleri 20 sn de dashboarddda basar. {% endcomment %}
 
 
 <div class="container">
 <h3>NODEMCU SICAKLIK TABLOSU </h3> 
+{% comment %} {% csrf_token %} {% endcomment %}
 <button class="btn btn-danger">BOOTSTRAP...</button>
 
         <div id="temperature_ajax">
