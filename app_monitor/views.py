@@ -79,6 +79,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
 # @csrf_exempt
 def deviceView(request,str_device_name):
     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
+    device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
     print(f"deviceView girdi, device={str_device_name} ")
     print(f"device çıktısı: , {device} ")
     print(f"str_device_name çıktısı: , {str_device_name} ")
@@ -86,6 +87,7 @@ def deviceView(request,str_device_name):
     context=dict(
         device=device,
         device_name=str_device_name,
+        device500=device500,
     )
     return render(request,"app_monitor/device.html",context)
 
