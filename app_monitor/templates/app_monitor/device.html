@@ -15,14 +15,17 @@
 
 
 <div class="container">
+  <div class="row">
+    <div class="col-sm-6 offset-sm-3">
 <h3>{{device_name}} SICAKLIK TABLOSU </h3> 
-{% comment %} {% csrf_token %} {% endcomment %}
-<button class="btn btn-danger">BOOTSTRAP...</button>
+</div><!--  header col  -->
+</div> <!--  header row  -->
+<div class="row">
 
-        <div >
-            <br><br>
+        <div class="col-sm-10 offset-sm-1">
+            <br>
             
-            <b>Son Kayıtlar: </b> <br>
+            <b>Kayıtlar: </b> <br>
                <table class="table">
               <thead>
                  <tr>
@@ -34,7 +37,7 @@
                </thead>
              <tbody>
             
-             {% for temp in device %}
+             {% for temp in devicePaginator %}
                <tr>
                    {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
                  <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
@@ -65,8 +68,31 @@
             
              </tbody>
             </table>
-            <br>
+
         </div>
+      </div>   <!--  row  -->
+  {# ************************************************************************************************************************************************************** #}
+  <!--  PAGINATOR  -->
+
+  <div class="pagination col-sm-6 offset-sm-3">
+    <span class="step-links">
+        {% if devicePaginator.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ devicePaginator.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
+  
+        {% endif %}
+  
+        <span class="current">
+            Page {{ devicePaginator.number }} of {{ devicePaginator.paginator.num_pages }}.
+        </span>
+  
+        {% if devicePaginator.has_next %}
+            <a href="?page={{ devicePaginator.next_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
+            <a href="?page={{ devicePaginator.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+  </div>
+  <br>    
   {# ************************************************************************************************************************************************************** #}
   <!--  CHART GRAFIK  -->
         <div class="row">
@@ -132,8 +158,9 @@
                       </script>
               <canvas id="myChart" width="300" height="150" style="border:1px solid #000000;"></canvas>
             </div>
-          </div>
-        </div>
+          </div> <!--  chart col  -->
+        </div> <!--  chart row  -->
+        <br>
 </div>
 
 {% endblock content %}

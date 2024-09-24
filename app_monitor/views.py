@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse,redirect
 from .models import Temperature
 from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 # from django.contrib
 
@@ -78,16 +79,25 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
 # GIT commit 240921-2
 # @csrf_exempt
 def deviceView(request,str_device_name):
+    deviceAll=Temperature.objects.filter(device_name=str_device_name).order_by('-id')
     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
     device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
     print(f"deviceView girdi, device={str_device_name} ")
     print(f"device çıktısı: , {device} ")
     print(f"str_device_name çıktısı: , {str_device_name} ")
+    paginator = Paginator(deviceAll, 5)  # Show 5 contacts per page.
+
+    device_search_count = deviceAll.count()
+
+    page_number = request.GET.get('page')
+
+    devicePaginator = paginator.get_page(page_number)
 
     context=dict(
         device=device,
         device_name=str_device_name,
         device500=device500,
+        devicePaginator=devicePaginator,
     )
     return render(request,"app_monitor/device.html",context)
 
