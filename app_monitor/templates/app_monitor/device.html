@@ -73,8 +73,8 @@
       </div>   <!--  row  -->
   {# ************************************************************************************************************************************************************** #}
   <!--  PAGINATOR  -->
-
-  <div class="pagination col-sm-6 offset-sm-3">
+  <div class="row">
+  <div class="pagination col-sm-4 offset-sm-1 ">
     <span class="step-links">
         {% if devicePaginator.has_previous %}
             <a href="?page=1">&laquo; first</a>
@@ -91,7 +91,15 @@
             <a href="?page={{ devicePaginator.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
     </span>
-  </div>
+  </div> <!-- paginator col  -->
+  <div class="col-sm-6">
+    <form action="/app_monitor/export_to_excel" method="get"> <!-- root adres "/" berlirtilmeli,relative adres olunca deviceView fonksiyonuna geri kaçıyor  -->
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}">
+    <input type="submit" class="btn btn-danger" value="Excel" >
+  </form>
+
+  </div><!-- excel button col  -->
+</div> <!--  row  -->
   <br>    
   {# ************************************************************************************************************************************************************** #}
   <!--  CHART GRAFIK  -->

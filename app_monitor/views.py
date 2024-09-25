@@ -3,6 +3,9 @@ from .models import Temperature
 from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
 from django.core.paginator import Paginator
+import django_excel as excel
+# from django.http import HttpResponse
+from openpyxl import Workbook
 
 # from django.contrib
 
@@ -95,9 +98,38 @@ def deviceView(request,str_device_name):
 
     context=dict(
         device=device,
-        device_name=str_device_name,
+        device_name=str_device_name.lower(),
         device500=device500,
         devicePaginator=devicePaginator,
     )
     return render(request,"app_monitor/device.html",context)
 
+#Excel export
+def exportExcel(request):
+    temps10=Temperature.objects.order_by('-id')[:10]
+    
+    return excel.make_response_from_a_table(Temperature, "xls", file_name="sheet")
+
+#Excel export 2
+def export_to_excel(request):
+    cihazadi=request.GET.get("cihazadi")
+    print(f"cihazadi= {cihazadi}")
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{cihazadi}.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = cihazadi
+
+    # Add headers
+    headers = ["device_name","id","temperature", "humidity", "volcum"]
+    ws.append(headers)
+
+    # Add data from the model
+    temp = Temperature.objects.all()
+    for temps in temp:
+        ws.append([temps.device_name,temps.id,temps.temperature, temps.humidity, temps.volcum])
+
+    # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response
