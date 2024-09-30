@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 import django_excel as excel
 # from django.http import HttpResponse
 from openpyxl import Workbook
+from django.db.models import Q
 
 # from django.contrib
 
@@ -101,6 +102,7 @@ def deviceView(request,str_device_name):
         device_name=str_device_name.lower(),
         device500=device500,
         devicePaginator=devicePaginator,
+        device_search_count=device_search_count,
     )
     return render(request,"app_monitor/device.html",context)
 
@@ -113,7 +115,11 @@ def exportExcel(request):
 #Excel export 2
 def export_to_excel(request):
     cihazadi=request.GET.get("cihazadi")
-    print(f"cihazadi= {cihazadi}")
+    id1=request.GET.get("id1")
+    id2=request.GET.get("id2")
+    nem1=request.GET.get("nem1")
+    nem2=request.GET.get("nem2")
+    print(f"cihazadi export_to_excel= {cihazadi}")
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = f'attachment; filename="{cihazadi}.xlsx"'
 
@@ -126,10 +132,35 @@ def export_to_excel(request):
     ws.append(headers)
 
     # Add data from the model
-    temp = Temperature.objects.all()
+    if (nem1 or nem2) != "" or None:
+        temp = Temperature.objects.filter(device_name__icontains=cihazadi,humidity__gte=nem1,humidity__lte=nem2)
+    elif (id1 or id2) != "" or None:
+        temp = Temperature.objects.filter(device_name__icontains=cihazadi,id__gte=id1,id__lte=id2)
+        print(f"excel id filtre sonuç nesneleri: {temp}")
+    else:
+        temp = Temperature.objects.filter(device_name__icontains=cihazadi)
     for temps in temp:
         ws.append([temps.device_name,temps.id,temps.temperature, temps.humidity, temps.volcum])
 
     # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response
+
+
+def export_to_excel_nem(request):
+    nem1=request.GET.get("nem1")
+    nem2=request.GET.get("nem2")
+    cihazadi=request.GET.get("cihazadi")
+    print(f"cihazadi= {cihazadi}")
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{cihazadi}.xlsx"'
+    wb = Workbook()
+    ws = wb.active
+    ws.title = cihazadi
+    headers = ["device_name","id","temperature", "humidity", "volcum"]
+    ws.append(headers)
+    temp = Temperature.objects.filter(device_name__icontains=cihazadi,humidity__gte=nem1,humidity__lte=nem2)
+    for temps in temp:
+        ws.append([temps.device_name,temps.id,temps.temperature, temps.humidity, temps.volcum])
     wb.save(response)
     return response

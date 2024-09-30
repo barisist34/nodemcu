@@ -13,25 +13,95 @@
 {% comment %} <script src="{% static 'js/temperature_ajax.js' %}"></script> {% endcomment %}
 {% comment %} temperature_ajax.js scripti random olarak djangonun ürettiği değerleri 20 sn de dashboarddda basar. {% endcomment %}
 
+<script>
+  function filtre_id(){
+    document.getElementById("filtre-id").submit();
+  }
+  function filtre_sicaklik(){
+    document.getElementById("filtre-sicaklik").submit();
+  }
+</script>
 
 <div class="container">
   <div class="row">
     <div class="col-sm-6 offset-sm-3">
-<h3>{{device_name}} SICAKLIK TABLOSU </h3> 
+<h3>{{device_name.upper}}  </h3> 
 </div><!--  header col  -->
 </div> <!--  header row  -->
+
+<!--  filtre  -->
+<!-- <form action="/app_monitor/device_filter_filter" > -->
+<div class="row offset-sm-1">
+
+  <div class="col">
+    <form action="/app_monitor/device_filter_id" method="get">
+    <label class="col-sm-10" for="">ID</label><br>
+    <input class="col-sm-10 mb-1" id="id-kucuk" name="id1" type="number" placeholder="İlk ID">
+    <input class="col-sm-10" id="id-buyuk" name="id2" type="number" placeholder="Son ID">
+    <input  type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- cihazadi hidden  -->
+    <button id="filtre-id" class="btn btn-danger btn-small col-sm-6 mt-1" type="submit" onsubmit="filtre_id()">ID</button>
+  </form>
+  </div>
+  <div class="col">
+    <form action="/app_monitor/device_filter_sicaklik" method="get">
+    <label class="col-sm-10" for="">Sıcaklık</label><br>
+    <input class="col-sm-10 mb-1" id="cihaz-sicaklik-kucuk" name="sicaklik1" type="number" placeholder="İlk Sıcaklık">
+    <input class="col-sm-10" id="cihaz-sicaklik-buyuk" name="sicaklik2" type="number" placeholder="Son Sıcaklık">
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- cihazadi hidden  -->
+    <button id="filtre-sicaklik" class="btn btn-danger btn-small col-sm-6 mt-1" type="submit" onsubmit="filtre_sicaklik()">SICAKLIK</button>
+  </form>
+  </div>
+  <div class="col">
+    <form action="/app_monitor/device_filter_nem" method="get">
+    <label class="col-sm-10" for="">Nem</label><br>
+    <input class="col-sm-10 mb-1" id="cihaz-nem-kucuk" name="nem1" type="number" placeholder="İlk Nem">
+    <input class="col-sm-10" id="cihaz-nem-buyuk" name="nem2" type="number" placeholder="Son Nem">
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- cihazadi hidden  -->
+    <button id="filtre-nem" class="btn btn-danger btn-small col-sm-6 mt-1" type="submit" onsubmit="filtre_sicaklik()">NEM</button>
+  </form>
+  </div>
+  <div class="col">
+    <form action="/app_monitor/device_filter_voltaj" method="get">
+    <label class="col-sm-10 " for="">Voltaj</label><br>
+    <input class="col-sm-10 mb-1" id="cihaz-voltaj-kucuk" name="voltaj1" type="number" placeholder="İlk Voltaj">
+    <input class="col-sm-10" id="cihaz-voltaj-buyuk" name="voltaj2" type="number" placeholder="Son Voltaj">
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- cihazadi hidden  -->
+    <button id="filtre-voltaj" class="btn btn-danger btn-small col-sm-6 mt-1" type="submit" >VOLTAJ</button>
+  </form>
+  </div>
+  <div class="col">
+    <form action="/app_monitor/device_filter_tarih" method="get">
+    <label class="col-sm-10 " for="">Tarih</label><br>
+    <input class="col-sm-10 mb-1" id="tarih-kucuk" name="tarih1" type="date" placeholder="İlk Tarih">
+    <input class="col-sm-10" id="tarih-buyuk" name="tarih2" type="date" placeholder="Son Tarih">
+    <input hidden  type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- cihazadi hidden  -->
+    <button id="filtre-tarih" class="btn btn-danger btn-small col-sm-6 mt-1" type="submit" >TARIH</button>
+  </form>
+  </div>
+  
+</div> <!--  row filtre  -->
+<div class="row">
+  <div class="col-sm-6 offset-sm-3 mt-2">
+  <!-- <input class="btn btn-danger" type="submit" value="Filtrele"> -->
+</div>
+</div> <!--  row submit  -->
+<!-- </form>  -->
+<!--  filtre son -->
+
+
 <div class="row">
 
         <div class="col-sm-10 offset-sm-1">
-            <br>
-            
-            <b>Kayıtlar: </b> <br>
+            <b>Kayıtlar: {{kayit_araligi}} </b> <br>
+            <b>Kayıt Sayısı: {{kayit_sayisi_filter}} {{device_search_count}} </b> <br> <!--  gelen fonksiyona göre kayıt sayılarından biri aktif olur (deviceView veya device_filter_*****) -->
                <table class="table">
               <thead>
                  <tr>
                    <th scope="col">id</th>
                    <th scope="col">Cihaz Adı</th>
                    <th scope="col">Sıcaklık</th>
+                   <th scope="col">Nem</th>
+                   <th scope="col">Voltaj</th>
                    <th scope="col">Tarih</th>            
                  </tr>
                </thead>
@@ -55,6 +125,9 @@
                  <th scope="row" >{{temp.id}}</th>
                  <td> {{temp.device_name}}</td>
                  <td >{{temp.temperature}}</td>
+                 <td >{{temp.humidity}}</td>
+                 <td >{{temp.volcum}}</td>
+
                 <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
                   <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
                   
@@ -77,8 +150,8 @@
   <div class="pagination col-sm-4 offset-sm-1 ">
     <span class="step-links">
         {% if devicePaginator.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ devicePaginator.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
+            <a href="?page=1&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}">&laquo; first</a>
+            <a href="?page={{ devicePaginator.previous_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
   
         {% endif %}
   
@@ -87,15 +160,20 @@
         </span>
   
         {% if devicePaginator.has_next %}
-            <a href="?page={{ devicePaginator.next_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
-            <a href="?page={{ devicePaginator.paginator.num_pages }}">last &raquo;</a>
+            <a href="?page={{ devicePaginator.next_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
+            <a href="?page={{ devicePaginator.paginator.num_pages }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}">last &raquo;</a>
         {% endif %}
     </span>
   </div> <!-- paginator col  -->
   <div class="col-sm-6">
     <form action="/app_monitor/export_to_excel" method="get"> <!-- root adres "/" berlirtilmeli,relative adres olunca deviceView fonksiyonuna geri kaçıyor  -->
-    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}">
-    <input type="submit" class="btn btn-danger" value="Excel" >
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="id1" value="{{id1}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="id2" value="{{id2}}"> <!-- hidden  -->
+
+    <input hidden type="text"  display="none" name="nem1" value="{{nem1}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="nem2" value="{{nem2}}"> <!-- hidden  -->
+    <input type="submit" class="btn btn-success" value="Excel" >
   </form>
 
   </div><!-- excel button col  -->
@@ -114,13 +192,29 @@
                           type: 'line',
                           data: {
                               labels: [{% for tempss in device500 %}'{{tempss.date}}',{% endfor %}],
-                              datasets: [{
+                              datasets: [
+                                {
                                             label: '# SICAKLIKLAR',
                                             data: [{% for tempss in device500 %}{{tempss.temperature}},{% endfor %}],
                                             fill: false,    //kullanılmazsa grafik altı dolu gelir   
-                                            borderColor: ['rgba(255, 10, 10, 10)',],  
+                                            borderColor: ['rgba(10, 10,255, 10)',],  
                                             borderWidth: 3
-                                        }]  
+                                        },
+                                {
+                                            label: '# NEM',
+                                            data: [{% for tempss in device500 %}{{tempss.humidity}},{% endfor %}],
+                                            fill: false,    //kullanılmazsa grafik altı dolu gelir   
+                                            borderColor: ['rgba(255, 255, 10, 10)',],  
+                                            borderWidth: 3
+                                        },
+                                {
+                                            label: '# VOLTAJ',
+                                            data: [{% for tempss in device500 %}{{tempss.volcum}},{% endfor %}],
+                                            fill: false,    //kullanılmazsa grafik altı dolu gelir   
+                                            borderColor: ['rgba(10, 255, 255, 10)',],  
+                                            borderWidth: 3
+                                        },
+                                      ]  
                                 },
                           options: {
                               responsive: true,
