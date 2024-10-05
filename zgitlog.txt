@@ -1,4 +1,9 @@
 
+
+
+240930-- cihaz sayfasında inputlar number ise rakamdan başka birşey html otomatik validasyonu nedeniyle girilemiyor.
+        validation filter.py de fonksiyonlarda id1,sicaklik1 gibi değişkenlerin queryde kontrolü ile yapıldı.
+        ** charts.js de x ekseninde label kısmı Tarih olarak güncellendi. console da hata veren XAxes kısmı konfigürasyonda silinerek hata kaldırıldı.
 240927-- filtre işlemi(id,sıcaklık,nem,voltaj,tarih) hepsi birlikte yapılamadı. Her değer için ayrı filtreleme butonu kondu.
         **excel aktarmada cihazadi ile alma yoktu,bütün kayıtlar geliyordu, query de temp = Temperature.objects.filter(device_name__icontains=cihazadi) 
         icontains ile Cihaz1 büyük problemi de düzeltildi.

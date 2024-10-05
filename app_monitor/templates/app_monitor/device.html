@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block title %}
-<title> {{device_name}} EKRANI</title>
+<title > {{device_name}} EKRANI</title>
 {% endblock title %} 
 
 {% comment %} {% static  "js/temperature_ajax.js" %} {% endcomment %}
@@ -24,8 +24,8 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-6 offset-sm-3">
-<h3>{{device_name.upper}}  </h3> 
+    <div class="col-sm-12">
+<h3 class="bg-primary text-center">{{device_name.upper}}  </h3> 
 </div><!--  header col  -->
 </div> <!--  header row  -->
 
@@ -228,8 +228,8 @@
                                                 display: true,
                                                 text: 'Tarih' //ÇALIŞAN X - LABEL
                                               },
-                                        display:true,
-                                        reverse:true,
+                                        //display:true,
+                                        //reverse:true,
                                         text:'Tarih...'
                                       },
 
