@@ -16,15 +16,15 @@ def device_filter_id(request):
     if id1=="" or None:
         filter_result=Temperature.objects.filter(
             id__gte=1,id__lte=id2
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     elif id2=="" or None:
         filter_result=Temperature.objects.filter(
             id__gte=id1
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     else:
         filter_result=Temperature.objects.filter(
                 id__gte=id1,id__lte=id2
-                )
+                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     kayit_sayisi_filter=filter_result.count()
     kayit_araligi=f"ID: {id1} -- {id2}"
     print(f"filter_result= {filter_result}")
@@ -57,15 +57,15 @@ def device_filter_sicaklik(request):
     if sicaklik1=="" or None:
             filter_result=Temperature.objects.filter(
             temperature__gte=0,temperature__lte=sicaklik2
-            )       
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')       
     elif sicaklik2=="" or None:
         filter_result=Temperature.objects.filter(
                 temperature__gte=sicaklik1
-                )
+                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     else:
             filter_result=Temperature.objects.filter(
             temperature__gte=sicaklik1,temperature__lte=sicaklik2
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     
     print(f"filter_result= {filter_result}")
     kayit_sayisi_filter=filter_result.count()
@@ -99,15 +99,15 @@ def device_filter_nem(request):
     if nem1=="" or None:
         filter_result=Temperature.objects.filter(
             humidity__gte=0,humidity__lte=nem2
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     elif nem2=="" or None:
         filter_result=Temperature.objects.filter(
             humidity__gte=nem1
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     else:
         filter_result=Temperature.objects.filter(
                 humidity__gte=nem1,humidity__lte=nem2
-                )
+                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     kayit_sayisi_filter=filter_result.count()
     kayit_araligi=f"Nem: {nem1} -- {nem2}"
     print(f"filter_result= {filter_result}")
@@ -138,15 +138,15 @@ def device_filter_voltaj(request):
     if voltaj1=="" or None:
         filter_result=Temperature.objects.filter(
             volcum__gte=0,volcum__lte=voltaj2
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     elif voltaj2=="" or None:
         filter_result=Temperature.objects.filter(
             volcum__gte=voltaj1
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     else:
         filter_result=Temperature.objects.filter(
                 volcum__gte=voltaj1,volcum__lte=voltaj2
-                )
+                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     kayit_sayisi_filter=filter_result.count()
     kayit_araligi=f"Voltaj: {voltaj1} -- {voltaj2}"
     print(f"filter_result= {filter_result}")
@@ -180,15 +180,15 @@ def device_filter_tarih(request):
     if tarih1=="" or None:
         filter_result=Temperature.objects.filter(
             date__lte=tarih2
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     elif tarih2=="" or None:
         filter_result=Temperature.objects.filter(
             date__gte=tarih1
-            )
+            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     else:
         filter_result=Temperature.objects.filter(
                 date__gte=tarih1,date__lte=tarih2
-                )
+                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
     kayit_sayisi_filter=filter_result.count()
     kayit_araligi=f"Tarih: {tarih1} -- {tarih2}"
     print(f"filter_result= {filter_result}")
