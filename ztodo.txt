@@ -1,6 +1,6 @@
 
 
-
+241013-- Device model, device_id,device_name,device_ip,device_port,device_function
 
 #YAPILANLAR#################################################
 240928-- anydesk ile casper dan asus a otomatik uzak masaüstü bağlantı kuruldu.
