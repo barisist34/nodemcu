@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse,redirect
-from .models import Temperature
+from .models import Temperature,Device
 from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -17,7 +17,11 @@ def ilk_def(request):
 
 def dashboard(request):
     print("dashboard girdi....")
-    return render(request,"app_monitor/dashboard.html")
+    device_query=Device.objects.all()
+    context=dict(
+        device_query=device_query,
+    )
+    return render(request,"app_monitor/dashboard.html",context)
 
 # @csrf_exempt
 # @requires_csrf_token
@@ -54,9 +58,23 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         humidity = request.GET.get("humidity")
         volcum = request.GET.get("volcum") #voltaj degeri
         device_name=request.GET.get("device_name")
-        device_id=request.GET.get("device_id")
+        print(f"Entry.DoesNotExist......??: {Device.objects.filter(device_id=3)}")
+        if not Device.objects.filter(device_name__icontains=device_name).exists():
+            print(f" {device_name}:  device_id database de olmayan blok girdi... ")
+            device_id_request=request.GET.get("device_id")
+            device_ip_request=request.GET.get("device_ip")
+            device_port_request=request.GET.get("device_port")
+            new_device=Device(device_id=device_id_request,device_name=device_name,device_port=device_port_request,device_ip=device_ip_request)
+            new_device.save()
+            print(f"new_device: {new_device}")
+            print(f"new device name: {new_device.device_name}")
+        device_id=Device.objects.get(device_name__icontains=device_name) #241013
+        
         print(f"kayit: {kayit} - device_name: {device_name}")
-        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now())
+
+        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now()) #241013
+        newRecord.save()
+        # newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name, date=timezone.now())
     else:
         kayit = request.POST.get("kayit")
         if 50<=int(kayit)<=55: # Sıcaklık 50-55 arasında olduğunda mail gönderimi de yapılacaktır.
@@ -67,7 +85,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         else:
             newRecord = Temperature(temperature=kayit, date=timezone.now())
     newRecord.save()
-    print(f"son eklenen kayıt: {newRecord.temperature}")
+    print(f"son eklenen sıcaklık: {newRecord.temperature}")
     
     tempsajax = Temperature.objects.order_by('-id')[:10]
     kayit_sayisi_total_ajax = Temperature.objects.count()
@@ -164,3 +182,8 @@ def export_to_excel_nem(request):
         ws.append([temps.device_name,temps.id,temps.temperature, temps.humidity, temps.volcum])
     wb.save(response)
     return response
+
+def django_device(request):
+    
+    return render(request,"dango_device.html")
+    

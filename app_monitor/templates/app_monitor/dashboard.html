@@ -51,21 +51,33 @@
                  <td> {{temp.device_name}}</td>
                  <td >{{temp.temperature}}</td>
                 <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
-                  <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
-                  
-            
-                   {% endif %}
-            
-               
-               </tr>  
-            
-             {% endfor %}
-            
+                  <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->            
+                   {% endif %}               
+               </tr>              
+             {% endfor %}            
              </tbody>
             </table>
-            <br>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 text-center mb-3">
+               <!-- <br>
+              <select name="" id="">
+                {% for device in device_query %}
+                <option value="{{device.device_name}}">
+                <a href="/app_monitor/cihazlar/{{device.device_name}}">{{device.device_name}}</a> 
+              </option>
+                {% endfor %}
+              </select> -->
+
+              Tüm Cihazlar:
+              <br>
+              {% for device in device_query %}
+              <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}" target="_blank">{{device.device_name}}</a> ,
+              {% endfor %}
+              <br>
+              <!-- Cihazlar{{device_query}} -->             
+              </div>
+              </div>
         </div>
-
-</div>
-
 {% endblock content %}
