@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,tempList,deviceView,exportExcel,export_to_excel
+from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,tempList,deviceView,exportExcel,export_to_excel,django_device,django_device_backtest
 from app_monitor.filter import device_filter_id,device_filter_sicaklik,device_filter_nem,device_filter_voltaj,device_filter_tarih
 
 # app_name="app_monitor"
@@ -19,5 +19,9 @@ urlpatterns=[
     path('device_filter_nem',device_filter_nem,name="device_filter_nem"),
     path('device_filter_voltaj',device_filter_voltaj,name="device_filter_voltaj"),
     path('device_filter_tarih',device_filter_tarih,name="device_filter_tarih"),
+    path('django_device',django_device,name="django_device"),
+    path('django_device_backtest',django_device_backtest,name="django_device_backtest"),
+    
+
 
 ]

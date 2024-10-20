@@ -184,6 +184,16 @@ def export_to_excel_nem(request):
     return response
 
 def django_device(request):
-    
-    return render(request,"dango_device.html")
-    
+    device_ip = request.GET.get("device_ip")
+    print(f"django_device girdi: {device_ip}")
+
+    context=dict(
+        device_ip=device_ip,
+    )
+
+    return render(request,"app_monitor/django_arduino.html",context)
+
+def django_device_backtest(request):
+    device_ip = request.GET.get("device_ip")
+    print(f"DJANGO BACKTEST girdi: {device_ip}")
+    return HttpResponse(device_ip)
