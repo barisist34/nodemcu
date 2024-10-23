@@ -12,24 +12,63 @@
 <!-- <script src="{% static 'js/cikislar.js' %}"></script>   -->
 
 <script>
-  function cikisAyarla(){
+
+  function cihazAdiAyarla(){
+    yeni_cihaz_adi=document.getElementById("cihaz-adi-ayarla").value;
+    console.log(" yeni_cihaz_adi :");
+    console.log(yeni_cihaz_adi)
+
+    $.ajax({        
+              //url: 'http://81.214.131.122:90/django_device',
+              url: 'http://81.214.131.122:{{device_port}}/device_update',
+              // type: 'POST',
+              type: 'GET',
+              data:{
+                device_name:yeni_cihaz_adi,
+              },
+              success: function(response){
+                console.log("ajax success girdi...");
+                console.log(response);
+              console.log(response.CihazAdi);
+              var numara=response.No;
+              document.getElementById("cihaz-adi").innerHTML=String(response.CihazAdi);
+              },
+                              failure: function() {
+                          //alert("ajax reverse fail geldi");
+                          console.log("ajax failure girdi...")
+                            }               
+          });
+  }
+
+  function cikisAyarla(butonno){
     console.log("cikis1 buton value değeri: ")
     //console.log(document.getElementById("cikis1").value)
     console.log(document.getElementById("cikis1-buton").innerHTML)
     var cikis1;
-    if (document.getElementById("cikis1-buton").innerHTML == "Aç"){
-        cikis1="HIGH";
-
-      }
-    else
-        cikis1="LOW";
-      
-    if (document.getElementById("cikis2-buton").innerHTML == "Aç"){
-        cikis2="HIGH";
-
-      }
-    else
-        cikis2="LOW";
+    var cikis2;
+    switch (butonno) {
+      case 1:
+        {
+          if (document.getElementById("cikis1-buton").innerHTML == "Aç"){
+          cikis1="HIGH";
+          }
+          else
+              cikis1="LOW";
+              }
+        break;
+      case 2:
+        {
+          if (document.getElementById("cikis2-buton").innerHTML == "Aç"){
+          cikis2="HIGH";
+          }
+          else
+              cikis2="LOW";
+              }
+        break;
+    
+      default:
+        break;
+    }
 
     $.ajax({        
         url: 'http://81.214.131.122:90/django_cikis_ayarla',
@@ -56,21 +95,16 @@
           }
           else {
             document.getElementById("cikis1-span").innerHTML= "Çıkış Kapalı";
-            document.getElementById("cikis1-buton").innerHTML="Aç";            
-
+            document.getElementById("cikis1-buton").innerHTML="Aç";
           }
-
           if (String(response.CihazCikis2) == "1") {
-
             document.getElementById("cikis2-span").innerHTML= "Çıkış Açık";
             document.getElementById("cikis2-buton").innerHTML="Kapat";
             }
             else {
             document.getElementById("cikis2-span").innerHTML= "Çıkış Kapalı";
-            document.getElementById("cikis2-buton").innerHTML="Aç";            
-
+            document.getElementById("cikis2-buton").innerHTML="Aç";
             }
-
         //$('#test').html(response);
         console.log(response.No);
         var numara=response.No;
@@ -81,8 +115,6 @@
         document.getElementById("cihaz-sicaklik").innerHTML=String(response.CihazSicaklik);
         document.getElementById("cihaz-nem").innerHTML=String(response.CihazNem);
         document.getElementById("cihaz-voltaj").innerHTML=String(response.CihazVoltaj);
-        
-
         },
                         failure: function() {
                     //alert("ajax reverse fail geldi");
@@ -92,26 +124,29 @@
 }
 </script>
 
-
-
-
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-
       <h3>DJANGO ARDUINO SAYFASI</h3>
-
 <h3>DEVICE IP</h3>
 <h2>{{device_ip}} </h2>
-
 <div id="test" class="test">TEST AJAX DIV</div>
-
 <table class="table">
   <th>Parametre</th>
   <th>Değer</th>
   <tr>
     <td>Cihaz Adı</td>
-    <td id="cihaz-adi"></td>
+    <td id="cihaz-adi">
+    </td>
+    <td><button id="cihazadi-buton-ayarla" class="btn btn-primary btn-sm" onclick="cihazAdiAyarlaBaslat()">Düzenle</button>  
+    </td>
+  </tr>
+  <tr>
+    <td>Cihaz Adı Düzenle</td>
+    <td id="cihaz-cikis1">
+      <input type="text" id="cihaz-adi-ayarla">
+      <button id="cihazadi-buton" class="btn btn-primary btn-sm" onclick="cihazAdiAyarla()">Gönder</button>      
+    </td>
   </tr>
   <tr>
     <td>Cihaz IP</td>
@@ -136,29 +171,29 @@
   <tr>
     <td>Çıkış1</td>
     <td id="cihaz-cikis1">
-      <button id="cikis1-buton" class="btn btn-primary btn-sm" onclick="cikisAyarla()">Aç</button>
+      <button id="cikis1-buton" class="btn btn-primary btn-sm" onclick="cikisAyarla(1)">Aç</button>
       <span id="cikis1-span"></span>
     </td>
   </tr>
   <tr>
     <td>Çıkış2</td>
     <td id="cihaz-cikis1">
-      <button id="cikis2-buton" class="btn btn-primary btn-sm" onclick="cikisAyarla()">Aç</button>
+      <button id="cikis2-buton" class="btn btn-primary btn-sm" onclick="cikisAyarla(2)">Aç</button>
       <span id="cikis2-span"></span>
     </td>
   </tr>
+
 </table>
 
     </div>
   </div>
 </div>
 
-
-
 <script>
 
 $.ajax({        
-              url: 'http://81.214.131.122:90/django_device',
+              //url: 'http://81.214.131.122:90/django_device',
+              url: 'http://81.214.131.122:{{device_port}}/django_device',
               // type: 'POST',
               type: 'GET',
               data:{

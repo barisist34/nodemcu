@@ -104,6 +104,7 @@ def deviceView(request,str_device_name):
     deviceAll=Temperature.objects.filter(device_name=str_device_name).order_by('-id')
     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
     device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
+    device_port=Device.objects.get(device_name=str_device_name).device_port
     print(f"deviceView girdi, device={str_device_name} ")
     print(f"device çıktısı: , {device} ")
     print(f"str_device_name çıktısı: , {str_device_name} ")
@@ -121,6 +122,7 @@ def deviceView(request,str_device_name):
         device500=device500,
         devicePaginator=devicePaginator,
         device_search_count=device_search_count,
+        device_port=device_port,
     )
     return render(request,"app_monitor/device.html",context)
 
@@ -185,10 +187,12 @@ def export_to_excel_nem(request):
 
 def django_device(request):
     device_ip = request.GET.get("device_ip")
+    device_port=request.GET.get("name-port")
     print(f"django_device girdi: {device_ip}")
 
     context=dict(
         device_ip=device_ip,
+        device_port=device_port,
     )
 
     return render(request,"app_monitor/django_arduino.html",context)

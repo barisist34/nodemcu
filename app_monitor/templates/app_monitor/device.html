@@ -249,6 +249,13 @@
         </div> <!--  chart row  -->
         <br>
         <div class="row">
+          <div class="col-sm-12 text-center">
+            <form action="/app_monitor/django_device" method="get" >
+              <input type="text" name="name-port"  value="{{device_port}}">
+            <!-- <su type="submit">{{device_name}} </button> -->
+             <input type="submit" value="{{device_name}} ">
+          </form>
+          </div>
           <div class="col-sm12 text-center fw-bold mb-3"><a href="/app_monitor" target="_blank">Anasayfa</a></div> <!--  241013  -->
         </div>
 </div>

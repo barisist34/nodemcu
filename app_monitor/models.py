@@ -9,7 +9,7 @@ class Device(models.Model):
     device_function=models.CharField(blank=True,null=True, max_length=20)
 
     def __str__(self):
-        return(f"ID:{self.device_id}")
+        return(f"{self.device_id}")
 
 class Temperature(models.Model):
     id=models.BigAutoField(primary_key=True,db_column='ID')
