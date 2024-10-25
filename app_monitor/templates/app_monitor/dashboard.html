@@ -10,7 +10,14 @@
 <script src="{% static 'js/temperature_ajax.js' %}"></script>
 {% comment %} temperature_ajax.js scripti random olarak djangonun ürettiği değerleri 20 sn de dashboarddda basar. {% endcomment %}
 
-
+<script>
+const timer=() => {
+  const time = new Date();
+  const time_string= time.toLocaleTimeString();
+  document.getElementById("saat").innerHTML=time_string;
+}
+  setInterval(timer,1000);
+  </script>
 <div class="container">
 <h3 class="bg-primary text-center">TÜM CİHAZLAR</h3> 
 {% comment %} {% csrf_token %} {% endcomment %}
