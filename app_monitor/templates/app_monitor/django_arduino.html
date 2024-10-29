@@ -20,7 +20,8 @@
 
     $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              url: 'http://81.214.131.122:{{device_port}}/device_update',
+              //url: 'http://81.214.131.122:{{device_port}}/device_name_update',
+              url: 'http://192.168.43.166:{{device_port}}/device_name_update',
               // type: 'POST',
               type: 'GET',
               data:{
@@ -39,6 +40,35 @@
                             }               
           });
   }
+
+  function cihazIdAyarla(){
+    yeni_cihaz_id=document.getElementById("cihaz-id-ayarla").value;
+    console.log(" yeni_cihaz_id :");
+    console.log(yeni_cihaz_id);
+
+    $.ajax({        
+              //url: 'http://81.214.131.122:90/django_device',
+              //url: 'http://81.214.131.122:{{device_port}}/device_id_update',
+              url: 'http://192.168.43.166:{{device_port}}/device_id_update',
+              // type: 'POST',
+              type: 'GET',
+              data:{
+                device_id:yeni_cihaz_id,
+              },
+              success: function(response){
+                console.log("ajax success girdi...");
+                console.log(response);
+              console.log(response.CihazId);
+              var numara=response.No;
+              document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
+              },
+                              failure: function() {
+                          //alert("ajax reverse fail geldi");
+                          console.log("ajax failure girdi...")
+                            }               
+          });
+  }
+
 
   function cikisAyarla(butonno){
     console.log("cikis1 buton value değeri: ")
@@ -71,7 +101,8 @@
     }
 
     $.ajax({        
-        url: 'http://81.214.131.122:90/django_cikis_ayarla',
+        //url: 'http://81.214.131.122:90/django_cikis_ayarla',
+        url: 'http://192.168.43.166:90/django_cikis_ayarla',
         // type: 'POST',
         type: 'GET',
         data:{
@@ -135,6 +166,21 @@
   <th>Parametre</th>
   <th>Değer</th>
   <tr>
+    <td>Cihaz ID</td>
+    <td id="cihaz-id">
+    </td>
+    <td><button id="cihazid-buton-ayarla" class="btn btn-primary btn-sm" onclick="cihazIdAyarlaBaslat()">Düzenle</button>  
+    </td>
+  </tr>
+  <tr>
+    <td>Cihaz ID Düzenle</td>
+    <td id="cihaz-cikis1">
+      <input type="text" id="cihaz-id-ayarla">
+      <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()">Gönder</button>      
+    </td>
+  </tr>
+  <tr>
+  <tr>
     <td>Cihaz Adı</td>
     <td id="cihaz-adi">
     </td>
@@ -193,7 +239,8 @@
 
 $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              url: 'http://81.214.131.122:{{device_port}}/django_device',
+              //url: 'http://81.214.131.122:{{device_port}}/django_device',
+              url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
               // type: 'POST',
               type: 'GET',
               data:{
@@ -213,6 +260,7 @@ $.ajax({
               console.log(response.No);
               var numara=response.No;
               console.log(typeof response.No);
+              document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
               document.getElementById("cihaz-adi").innerHTML=String(response.CihazAdi);
               document.getElementById("cihaz-ip").innerHTML=String(response.CihazIp);
               document.getElementById("cihaz-port").innerHTML=String(response.CihazPort);

@@ -65,7 +65,11 @@ const timer=() => {
              </tbody>
             </table>
             </div>
-
+            <div class="row">
+              <div class="col-sm-12">
+               <a href="/app_monitor/export_to_excel_all"> <button class="btn btn-success">EXCEL</button> </a> 
+              </div>
+            </div>
             <div class="row">
               <div class="col-sm-12 text-center mb-3">
                <!-- <br>
@@ -80,7 +84,10 @@ const timer=() => {
               Tüm Cihazlar:
               <br>
               {% for device in device_query %}
-              <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}" target="_blank">{{device.device_name}}</a> ,
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}" target="_blank">{{device.device_name}}</a> , {% endcomment %}
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/port={{device.device_port}} " target="_blank">{{device.device_name}}</a> , {% endcomment %}
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/devid={{device.pk}}/port={{device.device_port}} " target="_blank">{{device.device_name}}-{{device.device_id}} </a> , {% endcomment %}
+              <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/devid={{device.pk}}/port={{device.device_port}} " target="_blank">{{device.device_name}}-{{device.device_id}} </a> ,
               {% endfor %}
               <br>
               <!-- Cihazlar{{device_query}} -->             

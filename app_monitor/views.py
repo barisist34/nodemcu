@@ -7,6 +7,7 @@ import django_excel as excel
 # from django.http import HttpResponse
 from openpyxl import Workbook
 from django.db.models import Q
+from django.db.models.functions import Lower #241029
 
 # from django.contrib
 
@@ -17,7 +18,8 @@ def ilk_def(request):
 
 def dashboard(request):
     print("dashboard girdi....")
-    device_query=Device.objects.all()
+    # device_query=Device.objects.all().order_by('device_name')
+    device_query=Device.objects.all().order_by(Lower('device_name'))
     context=dict(
         device_query=device_query,
     )
@@ -68,7 +70,22 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
             new_device.save()
             print(f"new_device: {new_device}")
             print(f"new device name: {new_device.device_name}")
-        device_id=Device.objects.get(device_name__icontains=device_name) #241013
+
+        device_id_request=request.GET.get("device_id")
+        if not Device.objects.filter(device_id=device_id_request).exists():
+            print(f" {device_id_request}:  device_id database de olmayan blok girdi... ")
+            # device_id_request=request.GET.get("device_id")
+            device_ip_request=request.GET.get("device_ip")
+            device_port_request=request.GET.get("device_port")
+            new_device=Device(device_id=device_id_request,device_name=device_name,device_port=device_port_request,device_ip=device_ip_request)
+            new_device.save()
+            print(f"new_device: {new_device}")
+            print(f"new device name: {new_device.device_name}")
+        
+        
+        # device_id=Device.objects.get(device_name__icontains=device_name) #241013, device_id Device örneği olmalı, Foreignkey
+        device_id_request=request.GET.get("device_id")
+        device_id=Device.objects.filter(device_name__icontains=device_name).get(device_id=device_id_request) #241013, device_id Device örneği olmalı, Foreignkey
         
         print(f"kayit: {kayit} - device_name: {device_name}")
 
@@ -100,14 +117,49 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
 
 # GIT commit 240921-2
 # @csrf_exempt
-def deviceView(request,str_device_name):
+# def deviceView(request,str_device_name):
+def deviceView(request,str_device_name,port_no):
+# def deviceView(request,str_device_name): # parametrelerin sırası ÖNEMLİ
     deviceAll=Temperature.objects.filter(device_name=str_device_name).order_by('-id')
     device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
+    # device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
     device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
-    device_port=Device.objects.get(device_name=str_device_name).device_port
+    # device_port=Device.objects.get(device_name=str_device_name).device_port
+    device_port=port_no
     print(f"deviceView girdi, device={str_device_name} ")
     print(f"device çıktısı: , {device} ")
     print(f"str_device_name çıktısı: , {str_device_name} ")
+    print(f"port no url parametre: , {port_no} ")
+    paginator = Paginator(deviceAll, 5)  # Show 5 contacts per page.
+
+    device_search_count = deviceAll.count()
+
+    page_number = request.GET.get('page')
+
+    devicePaginator = paginator.get_page(page_number)
+
+    context=dict(
+        device=device,
+        device_name=str_device_name.lower(),
+        device500=device500,
+        devicePaginator=devicePaginator,
+        device_search_count=device_search_count,
+        device_port=device_port,
+    )
+    return render(request,"app_monitor/device.html",context)
+
+
+def deviceViewDetail(request,str_device_name,device_id,port_no): # parametrelerin sırası ÖNEMLİ
+    deviceAll=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')
+    device=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:10]
+    # device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
+    device500=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:500]
+    # device_port=Device.objects.get(device_name=str_device_name).device_port
+    device_port=port_no
+    print(f"deviceView girdi, device={str_device_name} ")
+    print(f"device çıktısı: , {device} ")
+    print(f"str_device_name çıktısı: , {str_device_name} ")
+    print(f"port no url parametre: , {port_no} ")
     paginator = Paginator(deviceAll, 5)  # Show 5 contacts per page.
 
     device_search_count = deviceAll.count()
@@ -148,19 +200,55 @@ def export_to_excel(request):
     ws.title = cihazadi
 
     # Add headers
-    headers = ["device_name","id","temperature", "humidity", "volcum"]
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum"]
     ws.append(headers)
 
     # Add data from the model
     if (nem1 or nem2) != "" or None:
-        temp = Temperature.objects.filter(device_name__icontains=cihazadi,humidity__gte=nem1,humidity__lte=nem2)
+        # temp = Temperature.objects.filter(device_name__icontains=cihazadi,humidity__gte=nem1,humidity__lte=nem2)
+        temp = Temperature.objects.filter(device_name=cihazadi,humidity__gte=nem1,humidity__lte=nem2)
     elif (id1 or id2) != "" or None:
-        temp = Temperature.objects.filter(device_name__icontains=cihazadi,id__gte=id1,id__lte=id2)
+        temp = Temperature.objects.filter(device_name=cihazadi,id__gte=id1,id__lte=id2)
         print(f"excel id filtre sonuç nesneleri: {temp}")
     else:
-        temp = Temperature.objects.filter(device_name__icontains=cihazadi)
+        # temp = Temperature.objects.filter(device_name__icontains=cihazadi)
+        temp = Temperature.objects.filter(device_name__iexact=cihazadi) #iexact kullanıldı exact değil
+        # temp = Temperature.objects.filter(device_name=cihazadi)
     for temps in temp:
-        ws.append([temps.device_name,temps.id,temps.temperature, temps.humidity, temps.volcum])
+        ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum])
+
+    # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response
+
+#Excel export ALL
+def export_to_excel_all(request):
+    # cihazadi=request.GET.get("cihazadi")
+    # id1=request.GET.get("id1")
+    # id2=request.GET.get("id2")
+    # nem1=request.GET.get("nem1")
+    # nem2=request.GET.get("nem2")
+    # print(f"cihazadi export_to_excel= {cihazadi}")
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="ALL.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "ALL"
+
+    # Add headers
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum"]
+    ws.append(headers)
+
+
+    temp = Temperature.objects.all() 
+        # temp = Temperature.objects.filter(device_name=cihazadi)
+    for temps in temp:
+        try:
+            ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum])
+            # ws.append([temps.id,temps.device_name,temps.temperature, temps.humidity, temps.volcum])
+        except AttributeError:
+            print("AttributeError oluştu...")
 
     # Save the workbook to the HttpResponse
     wb.save(response)
