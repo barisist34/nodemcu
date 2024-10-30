@@ -199,14 +199,14 @@
                               datasets: [
                                 {
                                             label: '# SICAKLIKLAR',
-                                            data: [{% for tempss in device500 %}{{tempss.temperature}},{% endfor %}],
+                                            data: [{% for tempss in device500 %} {% if tempss.temperature  %} {{tempss.temperature}} {% endif %},{% endfor %}],
                                             fill: false,    //kullanılmazsa grafik altı dolu gelir   
                                             borderColor: ['rgba(10, 10,255, 10)',],  
                                             borderWidth: 3
                                         },
                                 {
                                             label: '# NEM',
-                                            data: [{% for tempss in device500 %}{{tempss.humidity}},{% endfor %}],
+                                            data: [{% for tempss in device500 %} {% if tempss.temperature  %} {{tempss.humidity}} {% endif %} ,{% endfor %}],
                                             fill: false,    //kullanılmazsa grafik altı dolu gelir   
                                             borderColor: ['rgba(255, 255, 10, 10)',],  
                                             borderWidth: 3

@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+    <h3 class="text-center">TUM CIHAZLAR</h3>
+<table class="table table-striped">
+    <th>dd</th>
+    <th>dd</th>
+    <th>dd</th>
+    <tr>
+        <td>selam</td>
+        <td>selam</td>
+        <td>selam</td>
+    </tr>
+</table>
+
+<table class="table table-striped">
+    <th>Cihaz Adı</th>
+    <th>Cihaz Id</th>
+    <th>Cihaz Port</th>
+    <th>Cihaz IP</th>
+    <th>Cihaz Fonksiyonu</th>
+    {% for devices in devices_all %}
+    <tr>
+        <td><a href="/app_monitor/cihazlar/{{devices.device_name}}/devid={{devices.device_id}}/port={{devices.device_port}}">{{devices.device_name}}</a>  </td>
+        <td>{{devices.device_id}} </td>
+        <td>{{devices.device_port}} </td>
+        <td>{{devices.device_ip}} </td>
+        <td>{{devices.device_function}} </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</div>
+
+{% endblock content %}

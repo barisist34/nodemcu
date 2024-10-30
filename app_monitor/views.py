@@ -153,7 +153,7 @@ def deviceViewDetail(request,str_device_name,device_id,port_no): # parametreleri
     deviceAll=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')
     device=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:10]
     # device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
-    device500=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:500]
+    device500=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:50]
     # device_port=Device.objects.get(device_name=str_device_name).device_port
     device_port=port_no
     print(f"deviceView girdi, device={str_device_name} ")
@@ -289,3 +289,11 @@ def django_device_backtest(request):
     device_ip = request.GET.get("device_ip")
     print(f"DJANGO BACKTEST girdi: {device_ip}")
     return HttpResponse(device_ip)
+
+def devices_all(request):
+    devices_all=Device.objects.all()
+    context=dict(
+        devices_all=devices_all,
+
+    )
+    return render(request,"app_monitor/devices_all.html",context)
