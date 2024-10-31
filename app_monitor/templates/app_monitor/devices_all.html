@@ -24,13 +24,16 @@
     <th>Cihaz Port</th>
     <th>Cihaz IP</th>
     <th>Cihaz Fonksiyonu</th>
+    <th>Kayıt Sayısı</th>
     {% for devices in devices_all %}
     <tr>
-        <td><a href="/app_monitor/cihazlar/{{devices.device_name}}/devid={{devices.device_id}}/port={{devices.device_port}}">{{devices.device_name}}</a>  </td>
+        <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/devid={{devices.device_id}}/port={{devices.device_port}}">{{devices.device_name}}</a>  </td>
         <td>{{devices.device_id}} </td>
         <td>{{devices.device_port}} </td>
         <td>{{devices.device_ip}} </td>
         <td>{{devices.device_function}} </td>
+        <td>{{devices.temperature_set.all.count}} </td>   <!-- device tan temperature modele geçiş, ana model**yardımcı model -->
+        {% comment %} <td>{{devices.temperature_set.filter(device_name=devices.device_name).count}} </td> {% endcomment %}
     </tr>
     {% endfor %}
 </table>

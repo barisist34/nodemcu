@@ -43,6 +43,8 @@
 
   function cihazIdAyarla(){
     yeni_cihaz_id=document.getElementById("cihaz-id-ayarla").value;
+    cihaz_id_dizi=[{% for devices in devices_all %}devices.device_id,{% endfor %}]
+    console.log(`cihaz id'ler: ${cihaz_id_dizi}`)
     console.log(" yeni_cihaz_id :");
     console.log(yeni_cihaz_id);
 
@@ -299,7 +301,9 @@ $.ajax({
 //     console.log(error);
 // })
 
-
+yeni_cihaz_id=document.getElementById("cihaz-id-ayarla").value;
+cihaz_id_dizi=[{% for devices in devices_all %}  {{devices.device_id}},{% endfor %}]
+console.log(`cihaz id'ler: ${cihaz_id_dizi}`)
 
 </script>
 {% endblock content %}

@@ -277,10 +277,12 @@ def django_device(request):
     device_ip = request.GET.get("device_ip")
     device_port=request.GET.get("name-port")
     print(f"django_device girdi: {device_ip}")
+    devices_all=Device.objects.all()
 
     context=dict(
         device_ip=device_ip,
         device_port=device_port,
+        devices_all=devices_all,
     )
 
     return render(request,"app_monitor/django_arduino.html",context)
