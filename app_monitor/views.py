@@ -299,3 +299,5 @@ def devices_all(request):
 
     )
     return render(request,"app_monitor/devices_all.html",context)
+
+#241104 github commit test
