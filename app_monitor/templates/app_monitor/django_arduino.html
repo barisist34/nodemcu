@@ -20,8 +20,8 @@
 
     $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              //url: 'http://81.214.131.122:{{device_port}}/device_name_update',
-              url: 'http://192.168.43.166:{{device_port}}/device_name_update',
+              url: 'http://81.214.131.122:{{device_port}}/device_name_update',
+              //url: 'http://192.168.43.166:{{device_port}}/device_name_update',
               // type: 'POST',
               type: 'GET',
               data:{
@@ -42,16 +42,22 @@
   }
 
   function cihazIdAyarla(){
+    
     yeni_cihaz_id=document.getElementById("cihaz-id-ayarla").value;
-    cihaz_id_dizi=[{% for devices in devices_all %}devices.device_id,{% endfor %}]
+    cihaz_id_dizi=[{% for devices in devices_all %}{{devices.device_id}},{% endfor %}]
     console.log(`cihaz id'ler: ${cihaz_id_dizi}`)
     console.log(" yeni_cihaz_id :");
     console.log(yeni_cihaz_id);
-
+    if (cihaz_id_dizi.includes(Number(yeni_cihaz_id))){
+    //if (cihaz_id_dizi.includes(6)){
+    //if (1)
+     console.log(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
+    }
+    else {
     $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              //url: 'http://81.214.131.122:{{device_port}}/device_id_update',
-              url: 'http://192.168.43.166:{{device_port}}/device_id_update',
+              url: 'http://81.214.131.122:{{device_port}}/device_id_update',
+              //url: 'http://192.168.43.166:{{device_port}}/device_id_update',
               // type: 'POST',
               type: 'GET',
               data:{
@@ -69,6 +75,7 @@
                           console.log("ajax failure girdi...")
                             }               
           });
+        } //else sonu yeni_cihaz_id
   }
 
 
@@ -103,8 +110,8 @@
     }
 
     $.ajax({        
-        //url: 'http://81.214.131.122:90/django_cikis_ayarla',
-        url: 'http://192.168.43.166:90/django_cikis_ayarla',
+        url: 'http://81.214.131.122:90/django_cikis_ayarla',
+        //url: 'http://192.168.43.166:90/django_cikis_ayarla',
         // type: 'POST',
         type: 'GET',
         data:{
@@ -176,7 +183,7 @@
   </tr>
   <tr>
     <td>Cihaz ID Düzenle</td>
-    <td id="cihaz-cikis1">
+    <td id="cihaz-id-duzenle">
       <input type="text" id="cihaz-id-ayarla">
       <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()">Gönder</button>      
     </td>
@@ -191,7 +198,7 @@
   </tr>
   <tr>
     <td>Cihaz Adı Düzenle</td>
-    <td id="cihaz-cikis1">
+    <td id="cihaz-adi-duzenle">
       <input type="text" id="cihaz-adi-ayarla">
       <button id="cihazadi-buton" class="btn btn-primary btn-sm" onclick="cihazAdiAyarla()">Gönder</button>      
     </td>
@@ -241,8 +248,8 @@
 
 $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              //url: 'http://81.214.131.122:{{device_port}}/django_device',
-              url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
+              url: 'http://81.214.131.122:{{device_port}}/django_device',
+              //url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
               // type: 'POST',
               type: 'GET',
               data:{
