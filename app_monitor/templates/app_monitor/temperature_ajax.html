@@ -3,6 +3,7 @@
 
 <b> DEĞERLER TABLOSU</b><br>
 <b>Kayıt Sayısı : </b>{{kayit_sayisi_total_ajax}} <br>
+<b id="saat"> </b><br>
    <table class="table">
   <thead>
      <tr>
@@ -33,7 +34,7 @@
        {% else %}
 
      <th scope="row" >{{temp.id}}</th>
-     <td> <a target="_blank" href="/app_monitor/cihazlar/{{temp.device_name}}" >{{temp.device_name}}</a> </td>
+     <td> <a target="_blank" href="/app_monitor/cihazlar/{{temp.device_name}}/port={{temp.device_id.device_id}}" >{{temp.device_name}}</a> </td>
      <td> {{temp.device_id}}</td>
      <td >{{temp.temperature}}</td>
      <td >{{temp.humidity}}</td>

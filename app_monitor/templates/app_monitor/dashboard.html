@@ -10,7 +10,14 @@
 <script src="{% static 'js/temperature_ajax.js' %}"></script>
 {% comment %} temperature_ajax.js scripti random olarak djangonun ürettiği değerleri 20 sn de dashboarddda basar. {% endcomment %}
 
-
+<script>
+const timer=() => {
+  const time = new Date();
+  const time_string= time.toLocaleTimeString();
+  document.getElementById("saat").innerHTML=time_string;
+}
+  setInterval(timer,1000);
+  </script>
 <div class="container">
 <h3 class="bg-primary text-center">TÜM CİHAZLAR</h3> 
 {% comment %} {% csrf_token %} {% endcomment %}
@@ -58,7 +65,11 @@
              </tbody>
             </table>
             </div>
-
+            <div class="row">
+              <div class="col-sm-12">
+               <a href="/app_monitor/export_to_excel_all"> <button class="btn btn-success">EXCEL</button> </a> 
+              </div>
+            </div>
             <div class="row">
               <div class="col-sm-12 text-center mb-3">
                <!-- <br>
@@ -70,10 +81,14 @@
                 {% endfor %}
               </select> -->
 
-              Tüm Cihazlar:
+              <a href="/app_monitor/cihazlar_tum" target="_blank">Tüm Cihazlar:</a> 
+              
               <br>
               {% for device in device_query %}
-              <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}" target="_blank">{{device.device_name}}</a> ,
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}" target="_blank">{{device.device_name}}</a> , {% endcomment %}
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/port={{device.device_port}} " target="_blank">{{device.device_name}}</a> , {% endcomment %}
+              {% comment %} <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/devid={{device.pk}}/port={{device.device_port}} " target="_blank">{{device.device_name}}-{{device.device_id}} </a> , {% endcomment %}
+              <a href="/app_monitor/cihazlar/{{device.device_name.capitalize}}/devid={{device.pk}}/port={{device.device_port}} " target="_blank">{{device.device_name}}-{{device.device_id}} </a> ,
               {% endfor %}
               <br>
               <!-- Cihazlar{{device_query}} -->             
