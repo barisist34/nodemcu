@@ -20,7 +20,8 @@
 
     $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              url: 'http://81.214.131.122:{{device_port}}/device_name_update',
+              //url: 'http://81.214.131.122:{{device_port}}/device_name_update',
+              url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/device_name_update',
               //url: 'http://192.168.43.166:{{device_port}}/device_name_update',
               // type: 'POST',
               type: 'GET',
@@ -51,12 +52,45 @@
     if (cihaz_id_dizi.includes(Number(yeni_cihaz_id))){
     //if (cihaz_id_dizi.includes(6)){
     //if (1)
-     console.log(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
+     //console.log(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
+     //alert(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
+     //document.getElementById("cihaz-id-ayarla").value=""
+     if (confirm(`${yeni_cihaz_id} ID si daha önce kullanılmış. Devam ederseniz değişiklik yapılacaktır!!!`)==true){
+      $.ajax({        
+        //url: 'http://81.214.131.122:90/django_device',
+        //url: 'http://81.214.131.122:{{device_port}}/device_id_update',
+        url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/device_id_update',
+        //url: 'http://192.168.43.166:{{device_port}}/device_id_update',
+        // type: 'POST',
+        type: 'GET',
+        data:{
+          device_id:yeni_cihaz_id,
+        },
+        success: function(response){
+          console.log("ajax success girdi...");
+          console.log(response);
+        console.log(response.CihazId);
+        var numara=response.No;
+        document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
+        document.getElementById("cihaz-id-ayarla").value=""
+        },
+                        failure: function() {
+                    //alert("ajax reverse fail geldi");
+                    console.log("ajax failure girdi...")
+                      }               
+    });
+     }
+          else {
+                 console.log(`${yeni_cihaz_id} : cihaz ID girişten temizlendi.`);
+                //alert(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
+                document.getElementById("cihaz-id-ayarla").value=""
+          } //else iç kısım id değiştirme
     }
     else {
     $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              url: 'http://81.214.131.122:{{device_port}}/device_id_update',
+              //url: 'http://81.214.131.122:{{device_port}}/device_id_update',
+              url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/device_id_update',
               //url: 'http://192.168.43.166:{{device_port}}/device_id_update',
               // type: 'POST',
               type: 'GET',
@@ -110,7 +144,8 @@
     }
 
     $.ajax({        
-        url: 'http://81.214.131.122:90/django_cikis_ayarla',
+        //url: 'http://81.214.131.122:90/django_cikis_ayarla',
+        url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/django_cikis_ayarla',
         //url: 'http://192.168.43.166:90/django_cikis_ayarla',
         // type: 'POST',
         type: 'GET',
@@ -181,17 +216,15 @@
     <td><button id="cihazid-buton-ayarla" class="btn btn-primary btn-sm" onclick="cihazIdAyarlaBaslat()">Düzenle</button>  
     </td>
   </tr>
-  <tr>
+   <tr>
     <td>Cihaz ID Düzenle</td>
-<<<<<<< HEAD
-    <td id="cihaz-cikis1">
-=======
+
     <td id="cihaz-id-duzenle">
->>>>>>> 2ee8f5c2f61c5fc4a837586947ba6771359b72f7
+
       <input type="text" id="cihaz-id-ayarla">
       <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()">Gönder</button>      
     </td>
-  </tr>
+  </tr> 
   <tr>
   <tr>
     <td>Cihaz Adı</td>
@@ -252,7 +285,8 @@
 
 $.ajax({        
               //url: 'http://81.214.131.122:90/django_device',
-              url: 'http://81.214.131.122:{{device_port}}/django_device',
+              //url: 'http://81.214.131.122:{{device_port}}/django_device',
+              url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/django_device',
               //url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
               // type: 'POST',
               type: 'GET',

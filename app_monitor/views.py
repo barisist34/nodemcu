@@ -8,6 +8,7 @@ import django_excel as excel
 from openpyxl import Workbook
 from django.db.models import Q
 from django.db.models.functions import Lower #241029
+from django.conf import settings #241105
 
 # from django.contrib
 
@@ -149,7 +150,7 @@ def deviceView(request,str_device_name,port_no):
     return render(request,"app_monitor/device.html",context)
 
 
-def deviceViewDetail(request,str_device_name,device_id,port_no): # parametrelerin sırası ÖNEMLİ
+def deviceViewDetail(request,str_device_name,port_no,device_id): # parametrelerin sırası ÖNEMLİ
     deviceAll=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')
     device=Temperature.objects.filter(device_name=str_device_name).filter(device_id=device_id).order_by('-id')[:10]
     # device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
@@ -278,11 +279,13 @@ def django_device(request):
     device_port=request.GET.get("name-port")
     print(f"django_device girdi: {device_ip}")
     devices_all=Device.objects.all()
+    cihazlar_erisim_ip=settings.CIHAZLAR_ERISIM_IP
 
     context=dict(
         device_ip=device_ip,
         device_port=device_port,
         devices_all=devices_all,
+        cihazlar_erisim_ip=cihazlar_erisim_ip,
     )
 
     return render(request,"app_monitor/django_arduino.html",context)

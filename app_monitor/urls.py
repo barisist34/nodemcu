@@ -12,7 +12,7 @@ urlpatterns=[
     # path('cihazlar/<str:str_device_name>',deviceView,name="deviceView"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
     path('cihazlar/<str:str_device_name>/port=<int:port_no>',deviceView,name="deviceView"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
     # path('cihazlar/<str:str_device_name>/devid=<int:device_id>/port=<int:port_no>',deviceView,name="deviceView"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
-    path('cihazlar/<str:str_device_name>/devid=<int:device_id>/port=<int:port_no>',deviceViewDetail,name="deviceViewDetail"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
+    path('cihazlar/<str:str_device_name>/port=<int:port_no>/devid=<int:device_id>',deviceViewDetail,name="deviceViewDetail"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
     path('cihazlar_tum',devices_all,name="devices_all"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
 
     # path('TemperatureAddRecord',TemperatureAddRecord,name="TemperatureAddRecord"),

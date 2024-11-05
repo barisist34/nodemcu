@@ -27,7 +27,7 @@
     <th>Kayıt Sayısı</th>
     {% for devices in devices_all %}
     <tr>
-        <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/devid={{devices.device_id}}/port={{devices.device_port}}">{{devices.device_name}}</a>  </td>
+        <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/port={{devices.device_port}}/devid={{devices.device_id}}">{{devices.device_name}}</a>  </td>
         <td>{{devices.device_id}} </td>
         <td>{{devices.device_port}} </td>
         <td>{{devices.device_ip}} </td>
