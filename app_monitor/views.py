@@ -277,6 +277,7 @@ def export_to_excel_nem(request):
 def django_device(request):
     device_ip = request.GET.get("device_ip")
     device_port=request.GET.get("name-port")
+    device_name=request.GET.get("device_name"),
     print(f"django_device girdi: {device_ip}")
     devices_all=Device.objects.all()
     cihazlar_erisim_ip=settings.CIHAZLAR_ERISIM_IP
@@ -286,6 +287,7 @@ def django_device(request):
         device_port=device_port,
         devices_all=devices_all,
         cihazlar_erisim_ip=cihazlar_erisim_ip,
+        device_name=device_name,
     )
 
     return render(request,"app_monitor/django_arduino.html",context)

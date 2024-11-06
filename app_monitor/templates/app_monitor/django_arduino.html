@@ -13,6 +13,16 @@
 
 <script>
 
+  function cihazAdiAyarlaBaslat(){
+    //document.getElementById("tr-id-duzenle").style.display="block"
+    //document.getElementById("tr-id-duzenle").style.visibility="visible"
+    //$("#tr-id-duzenle").removeClass('border-secondary').addClass('d-block');
+    //$("#tr-id-duzenle").removeClass('d-none').addClass('d-block');
+    $("#tr-adi-duzenle").removeClass('d-none');
+    $("#cihazid-buton-ayarla").addClass('d-none');
+    $("#cihazadi-buton-ayarla").addClass('d-none');
+  }  
+
   function cihazAdiAyarla(){
     yeni_cihaz_adi=document.getElementById("cihaz-adi-ayarla").value;
     console.log(" yeni_cihaz_adi :");
@@ -34,12 +44,25 @@
               console.log(response.CihazAdi);
               var numara=response.No;
               document.getElementById("cihaz-adi").innerHTML=String(response.CihazAdi);
+              $("#tr-adi-duzenle").addClass('d-none');
+              $("#cihazid-buton-ayarla").removeClass('d-none');
+              $("#cihazadi-buton-ayarla").removeClass('d-none');
               },
                               failure: function() {
                           //alert("ajax reverse fail geldi");
                           console.log("ajax failure girdi...")
                             }               
           });
+  }
+
+  function cihazIdAyarlaBaslat(){
+    //document.getElementById("tr-id-duzenle").style.display="block"
+    //document.getElementById("tr-id-duzenle").style.visibility="visible"
+    //$("#tr-id-duzenle").removeClass('border-secondary').addClass('d-block');
+    //$("#tr-id-duzenle").removeClass('d-none').addClass('d-block');
+    $("#tr-id-duzenle").removeClass('d-none');
+    $("#cihazid-buton-ayarla").addClass('d-none');
+    $("#cihazadi-buton-ayarla").addClass('d-none');
   }
 
   function cihazIdAyarla(){
@@ -73,6 +96,11 @@
         var numara=response.No;
         document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
         document.getElementById("cihaz-id-ayarla").value=""
+        //document.getElementById("tr-id-duzenle").style.display="none"
+        //document.getElementById("tr-id-duzenle").style.visibility="hidden"
+        $("#tr-id-duzenle").addClass('d-none');
+        $("#cihazid-buton-ayarla").removeClass('d-none');
+        $("#cihazadi-buton-ayarla").removeClass('d-none');
         },
                         failure: function() {
                     //alert("ajax reverse fail geldi");
@@ -84,6 +112,9 @@
                  console.log(`${yeni_cihaz_id} : cihaz ID girişten temizlendi.`);
                 //alert(`${yeni_cihaz_id} : cihaz ID daha önce kullanılmış`);
                 document.getElementById("cihaz-id-ayarla").value=""
+                $("#tr-id-duzenle").addClass('d-none');
+                $("#cihazid-buton-ayarla").removeClass('d-none');
+                $("#cihazadi-buton-ayarla").removeClass('d-none');
           } //else iç kısım id değiştirme
     }
     else {
@@ -209,6 +240,7 @@
 <table class="table">
   <th>Parametre</th>
   <th>Değer</th>
+  <th></th>
   <tr>
     <td>Cihaz ID</td>
     <td id="cihaz-id">
@@ -216,13 +248,14 @@
     <td><button id="cihazid-buton-ayarla" class="btn btn-primary btn-sm" onclick="cihazIdAyarlaBaslat()">Düzenle</button>  
     </td>
   </tr>
-   <tr>
+   <tr id="tr-id-duzenle" class="d-none"> <!-- style="visibility:hidden"  style="display:none"-->
     <td>Cihaz ID Düzenle</td>
 
-    <td id="cihaz-id-duzenle">
-
-      <input type="text" id="cihaz-id-ayarla">
-      <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()">Gönder</button>      
+    <td id="cihaz-id-duzenle" style="">
+    
+      <input type="text" id="cihaz-id-ayarla"></td>
+      <td>
+      <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()" >Gönder</button>      
     </td>
   </tr> 
   <tr>
@@ -233,7 +266,7 @@
     <td><button id="cihazadi-buton-ayarla" class="btn btn-primary btn-sm" onclick="cihazAdiAyarlaBaslat()">Düzenle</button>  
     </td>
   </tr>
-  <tr>
+  <tr id="tr-adi-duzenle" class="d-none">
     <td>Cihaz Adı Düzenle</td>
     <td id="cihaz-adi-duzenle">
       <input type="text" id="cihaz-adi-ayarla">
