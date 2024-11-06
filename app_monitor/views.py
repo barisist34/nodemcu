@@ -9,6 +9,7 @@ from openpyxl import Workbook
 from django.db.models import Q
 from django.db.models.functions import Lower #241029
 from django.conf import settings #241105
+from datetime import datetime
 
 # from django.contrib
 
@@ -277,7 +278,7 @@ def export_to_excel_nem(request):
 def django_device(request):
     device_ip = request.GET.get("device_ip")
     device_port=request.GET.get("name-port")
-    device_name=request.GET.get("device_name"),
+    device_name=request.GET.get("device_name")
     print(f"django_device girdi: {device_ip}")
     devices_all=Device.objects.all()
     cihazlar_erisim_ip=settings.CIHAZLAR_ERISIM_IP
@@ -299,10 +300,24 @@ def django_device_backtest(request):
 
 def devices_all(request):
     devices_all=Device.objects.all()
+    datetime_now=datetime.now()
+    devices_online=[]
+    print(f"devices_all:{devices_all}")
+    # print(f"datetime.now(){datetime_now}")
+    # print(f"timestamp now {datetime.timestamp(datetime_now)}")
+    for device in devices_all:
+        if datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) < 60:
+            devices_online.append(device.temperature_set.last().device_id.device_id)
+
+            print(f"datetime_now- device.temperature_set.last.date() {device.temperature_set.last().device_id}: {datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) }")
+    #     if timezone.now - device.temperature_set.last.date 
+    print(f"online cihazlar: {devices_online}")
     context=dict(
         devices_all=devices_all,
+        devices_online=devices_online,
 
     )
     return render(request,"app_monitor/devices_all.html",context)
+
 
 #241104 github commit test

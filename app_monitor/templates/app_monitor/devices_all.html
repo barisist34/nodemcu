@@ -7,37 +7,76 @@
 <div class="container">
 
     <h3 class="text-center">TUM CIHAZLAR</h3>
-<table class="table table-striped">
-    <th>dd</th>
-    <th>dd</th>
-    <th>dd</th>
-    <tr>
-        <td>selam</td>
-        <td>selam</td>
-        <td>selam</td>
-    </tr>
-</table>
 
-<table class="table table-striped">
+<table class="table table-striped tablo-online">
     <th>Cihaz Adı</th>
     <th>Cihaz Id</th>
     <th>Cihaz Port</th>
     <th>Cihaz IP</th>
     <th>Cihaz Fonksiyonu</th>
     <th>Kayıt Sayısı</th>
+    <th>Online</th>
+    <th>Son Durum</th>
+    <th>İlk bağlantı</th>
     {% for devices in devices_all %}
-    <tr>
+    <tr class="device-row">
         <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/port={{devices.device_port}}/devid={{devices.device_id}}">{{devices.device_name}}</a>  </td>
         <td>{{devices.device_id}} </td>
         <td>{{devices.device_port}} </td>
         <td>{{devices.device_ip}} </td>
         <td>{{devices.device_function}} </td>
         <td>{{devices.temperature_set.all.count}} </td>   <!-- device tan temperature modele geçiş, ana model**yardımcı model -->
+        <td>    <!-- ONLINE KONTROLU-->
+
+            {% if  devices.device_id in devices_online %}
+            <b class="b-online-check" style="background-color: green;padding: 5%;">ONLINE</b> 
+            <script>
+                //$(".b-online-check").addClass('bg-success');
+                //document.getElementsByClassName("b-online-check").style.color="red"
+            </script>
+            {% else %}
+            <b class="b-online-check" style="background-color: red;padding: 5%;">OFFLINE</b> 
+            {% endif %}
+           
+        </td>   <!-- ONLINE KONTROLU-->
+        <td>{{devices.temperature_set.last.date|date:"d-m-Y"}} {{devices.temperature_set.last.date|time:"H:i:s"}} </td>   
         {% comment %} <td>{{devices.temperature_set.filter(device_name=devices.device_name).count}} </td> {% endcomment %}
+        <td>{{devices.temperature_set.first.date|date:"d-m-Y"}} {{devices.temperature_set.first.date|time:"H:i:s"}} </td>   
     </tr>
     {% endfor %}
 </table>
 
 </div>
+
+<script>
+    function online_control()
+{
+    $.ajax({        
+              url: 'cihazlar_tum',
+              // type: 'POST',
+              type: 'GET',
+              data:{
+              //SicaklikKayit:SicaklikKayit,
+              // csrfmiddlewaretoken: '{{ csrf_token }}',
+              // dataType: "json",
+              },
+              // beforeSend: function (xhr){
+              //   xhr.setRequestHeader('X-CSRFToken', csrftoken);
+              // },
+              success: function(response){
+              $('.container').html(response);
+              console.log("online cihaz durumu yenilendi...")
+              },
+                              failure: function() {
+                          alert("ajax reverse fail geldi");
+                            }               
+          });
+  }
+  $(document).ready(online_control()) // sayfa manuel refresh yapıldığında 60 saniye beklemeden ilk kayıdı yapabilmek için. 
+                                      //Birden fazla pencerede dashboard açılırsa otomatik 1den fazla kayıt yapılmış olur,hatalı işleme denk gelir.
+  $(document).ready(function(){
+    setInterval(online_control,20000);
+    });
+</script>
 
 {% endblock content %}
