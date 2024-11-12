@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,tempList,deviceView,exportExcel,export_to_excel
 from app_monitor.views import django_device,django_device_backtest,deviceViewDetail,export_to_excel_all,devices_all
+from app_monitor.views import device_id,export_to_excel_id
 from app_monitor.filter import device_filter_id,device_filter_sicaklik,device_filter_nem,device_filter_voltaj,device_filter_tarih
 
 # app_name="app_monitor"
@@ -13,6 +14,7 @@ urlpatterns=[
     path('cihazlar/<str:str_device_name>/port=<int:port_no>',deviceView,name="deviceView"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
     # path('cihazlar/<str:str_device_name>/devid=<int:device_id>/port=<int:port_no>',deviceView,name="deviceView"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
     path('cihazlar/<str:str_device_name>/port=<int:port_no>/devid=<int:device_id>',deviceViewDetail,name="deviceViewDetail"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
+    path('cihazlar/<int:device_id>',device_id,name="device_id"),
     path('cihazlar_tum',devices_all,name="devices_all"), #<str:**> parametresi çok dikkatli kullanılmalı,string oldugu için diğer url leri ezmektedir. Ayrıca cihazlar/ şeklinde bir yol da eklenmelidir.
 
     # path('TemperatureAddRecord',TemperatureAddRecord,name="TemperatureAddRecord"),
@@ -20,6 +22,7 @@ urlpatterns=[
     path('exportExcel',exportExcel,name="exportExcel"),
     path('export_to_excel',export_to_excel,name="export_to_excel"),
     path('export_to_excel_all',export_to_excel_all,name="export_to_excel_all"),
+    path('export_to_excel_id',export_to_excel_id,name="export_to_excel_id"),
     # path('device_filter',device_filter,name="device_filter"),
     path('device_filter_id',device_filter_id,name="device_filter_id"),
     path('device_filter_sicaklik',device_filter_sicaklik,name="device_filter_sicaklik"),

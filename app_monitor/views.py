@@ -63,7 +63,9 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         volcum = request.GET.get("volcum") #voltaj degeri
         device_name=request.GET.get("device_name")
         print(f"Entry.DoesNotExist......??: {Device.objects.filter(device_id=3)}")
-        if not Device.objects.filter(device_name__icontains=device_name).exists():
+        # if not Device.objects.filter(device_name__icontains=device_name).exists():
+        if not Device.objects.filter(device_name__iexact=device_name).exists():
+            # temp = Temperature.objects.filter(device_name__iexact=cihazadi) #iexact kullanıldı exact değil
             print(f" {device_name}:  device_id database de olmayan blok girdi... ")
             device_id_request=request.GET.get("device_id")
             device_ip_request=request.GET.get("device_ip")
@@ -128,6 +130,7 @@ def deviceView(request,str_device_name,port_no):
     device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
     # device_port=Device.objects.get(device_name=str_device_name).device_port
     device_port=port_no
+    device_id_dizi=[]
     print(f"deviceView girdi, device={str_device_name} ")
     print(f"device çıktısı: , {device} ")
     print(f"str_device_name çıktısı: , {str_device_name} ")
@@ -139,7 +142,8 @@ def deviceView(request,str_device_name,port_no):
     page_number = request.GET.get('page')
 
     devicePaginator = paginator.get_page(page_number)
-
+    device_id_dizi=[device.device_id for device in Device.objects.filter(device_name=str_device_name)] #241106 List Comprehension ile dizi oluşturma
+    print(f"{str_device_name} device ID ler: {device_id_dizi}")
     context=dict(
         device=device,
         device_name=str_device_name.lower(),
@@ -147,6 +151,7 @@ def deviceView(request,str_device_name,port_no):
         devicePaginator=devicePaginator,
         device_search_count=device_search_count,
         device_port=device_port,
+        device_id_dizi=device_id_dizi,
     )
     return render(request,"app_monitor/device.html",context)
 
@@ -179,6 +184,28 @@ def deviceViewDetail(request,str_device_name,port_no,device_id): # parametreleri
         device_port=device_port,
     )
     return render(request,"app_monitor/device.html",context)
+
+def device_id(request,device_id): #241111
+# def deviceView(request,str_device_name): # parametrelerin sırası ÖNEMLİ
+    device_id_query=Temperature.objects.filter(device_id=device_id).order_by('-id')
+
+    paginator = Paginator(device_id_query, 5)  # Show 5 contacts per page.
+
+    device_search_count = device_id_query.count()
+
+    page_number = request.GET.get('page')
+
+    devicePaginator = paginator.get_page(page_number)
+    # device_id_dizi=[device.device_id for device in Device.objects.filter(device_name=str_device_name)] #241106 List Comprehension ile dizi oluşturma
+    # print(f"{str_device_name} device ID ler: {device_id_dizi}")
+    context=dict(
+        devicePaginator=devicePaginator,
+        device_search_count=device_search_count,
+        device_id=str(device_id),
+        # device_port=device_port,
+
+    )
+    return render(request,"app_monitor/device_id.html",context)
 
 #Excel export
 def exportExcel(request):
@@ -248,6 +275,39 @@ def export_to_excel_all(request):
     for temps in temp:
         try:
             ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum])
+            # ws.append([temps.id,temps.device_name,temps.temperature, temps.humidity, temps.volcum])
+        except AttributeError:
+            print("AttributeError oluştu...")
+
+    # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response
+
+#Excel export ID
+def export_to_excel_id(request):
+    cihazid=request.GET.get("cihazid")
+    # id1=request.GET.get("id1")
+    # id2=request.GET.get("id2")
+    # nem1=request.GET.get("nem1")
+    # nem2=request.GET.get("nem2")
+    # print(f"cihazadi export_to_excel= {cihazadi}")
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{cihazid}.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"{cihazid}"
+
+    # Add headers
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum","tarih"]
+    ws.append(headers)
+
+
+    temp = Temperature.objects.filter(device_id=cihazid) 
+        # temp = Temperature.objects.filter(device_name=cihazadi)
+    for temps in temp:
+        try:
+            ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum,str(temps.date)])
             # ws.append([temps.id,temps.device_name,temps.temperature, temps.humidity, temps.volcum])
         except AttributeError:
             print("AttributeError oluştu...")
