@@ -1,0 +1,68 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show col-sm-6 offset-sm-3" role="alert">
+    <strong>{{ message|safe }}</strong> 
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+        <hr>
+        <form action="arduino_serial" method="get">
+            <select name="comport" id="comport">
+                <option value="COM1" >COM1</option>
+                <option value="COM2">COM2</option>
+                <option value="COM3" >COM3</option>
+                <option value="COM4" selected>COM4</option>
+                <option value="COM5">COM5</option>
+                <option value="COM6">COM6</option>
+                <option value="COM7">COM7</option>
+                <option value="COM8">COM8</option>
+                <option value="COM9">COM9</option>
+                <option value="COM10">COM10</option>
+            </select>
+            <input type="text" name="serial_data" id="serial-data-id">
+            <input type="submit" value="ARDUINO GONDER">
+        </form>
+    <h3>ARDUINO dan gelen veri: {{value}} </h3>
+    
+    <hr>
+    
+    <form action="arduino_serial" method="get">
+    
+    <input type="submit" value="GONDER">
+    </form>
+    
+    COMPORT = {{comport}}
+    {% if comport == "COMxx" %}
+    <h3>COMPORT hatalı girdiniz... </h3>
+    {% endif %}
+    <form action="/arduino_serial" method="get">
+        <input type="text" name="serial_data" id="serial-data-id" placeholder="Server IP">
+        <input type="submit" value="Server IP">
+    </form>
+    <form action="/arduino_serial" method="get">
+        <input type="text" name="serial_data" id="serial-data-id" placeholder="Cihaz IP">
+        <input type="submit" value="Cihaz IP">
+    </form>
+    <form action="/arduino_serial" method="get">
+        <input type="text" name="serial_data" id="serial-data-id" placeholder="Port">
+        <input type="submit" value="PORT">
+    </form>
+    <form action="/arduino_serial" method="get">
+        <input type="text" name="serial_data" id="serial-data-id" placeholder="Default Gateway">
+        <input type="submit" value="Default Gateway">
+    </form>
+    
+    <h5>BAĞLI PORTLAR</h5>
+    <h6>{{port_listesi}} </h6>
+    {% comment %} <h3>ARDUINO dan gelen veri: {{value|stringformat:"d"}} </h3> {% endcomment %}
+    </div>
+
+{% endblock content %}

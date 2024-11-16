@@ -10,6 +10,12 @@ from django.db.models import Q
 from django.db.models.functions import Lower #241029
 from django.conf import settings #241105
 from datetime import datetime
+#seri-port-usb-config
+import serial
+import serial.tools.list_ports
+import time
+from django.contrib import messages #241115
+
 
 # from django.contrib
 
@@ -379,5 +385,75 @@ def devices_all(request):
     )
     return render(request,"app_monitor/devices_all.html",context)
 
+######################USB-SERI-PORT-CONFIG######################
+def arduino_serial(request):
+    # arduino = serial.Serial(port='COM5',  baudrate=115200, timeout=.1)
+    # arduino.write(bytes(x,  'utf-8'))
+    # time.sleep(0.05)
+    # data = arduino.readline()
+    print(f"typeCOM port: {type(request.GET.get('comport'))}")
+    print(f"comport request: {request.GET.get('comport')}")
+    # if type(request.GET.get("comport"))!="<class 'NoneType'>":
+    if request.GET.get("comport")!=None:
+        comport=request.GET.get("comport")
+        print(f"comport: {comport}")
+    else:
+        comport="COMxx"
+        print(f"comport else: {comport}")
+    # if request.GET.get('serial_data') is not "" or None:
+    print(f"TYPE request.GET.get('serial_data'): {type(request.GET.get('serial_data'))}")
+    print(f"request.GET.get('serial_data'): {request.GET.get('serial_data')}")
+    if request.GET.get('serial_data')!=None: #241115 form inputları NoneType kontrolu***********************
+        data_browser=request.GET.get('serial_data')
+        print(f"tpye request.GET.get('serial_data'): {type(request.GET.get('serial_data'))}")
+        print(f"data_browser={data_browser}")
+    else:
+        data_browser=str(33)
+        print(f"if not serial data: {data_browser} ")
+        print(f"tpye(data_browser): {type(data_browser)}")
+    # num = input("Enter a number: ")
+    # value  = write_read(num)
+    # value  = int(write_read(data_browser))
+    # value  = write_read(data_browser)
+    value  = write_read(data_browser,comport)
+    # import serial.tools.list_ports
+    port_listesi=[]
+    all_serial_ports=serial.tools.list_ports.comports()
+    for port in list(serial.tools.list_ports.comports()):
 
-#241104 github commit test
+        print(port[0])
+        port_listesi.append(port[0])
+    print(f"port listesi: {port_listesi}")
+    myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
+    # myports = [tuple(p[0]) for p in list(serial.tools.list_ports.comports())]
+    # print (myports[0][0])
+    print(myports)
+    print(f"all serial ports: {all_serial_ports}")
+    context=dict(
+        value=value,
+        comport=comport,
+        myports=myports,
+        port_listesi=port_listesi,
+    )
+    if value == None:
+        messages.info(request,f"COM portunu hatalı girdiniz...<br>COM port değeri: {value}")
+
+    print(f"value: {value}")
+    return render(request,"app_monitor/arduino_serial.html",context)
+
+# def write_read(x):
+def write_read(x,comport):
+    # arduino = serial.Serial(port='COM5',  baudrate=115200, timeout=.1)
+    try:
+        # arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        # arduino = serial.Serial(port=comport,  baudrate=600, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino.write(bytes(x,  'utf-8'))
+        time.sleep(0.05)
+        data = arduino.readline()
+        return  data
+    except :
+        print("FileNotFoundError exception oluştu")
+
+        # raise Exception("COM portu yanlış giriyorsunuz...")

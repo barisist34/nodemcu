@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,tempList,deviceView,exportExcel,export_to_excel
 from app_monitor.views import django_device,django_device_backtest,deviceViewDetail,export_to_excel_all,devices_all
-from app_monitor.views import device_id,export_to_excel_id
+from app_monitor.views import device_id,export_to_excel_id,arduino_serial
 from app_monitor.filter import device_filter_id,device_filter_sicaklik,device_filter_nem,device_filter_voltaj,device_filter_tarih
 
 # app_name="app_monitor"
@@ -31,6 +31,7 @@ urlpatterns=[
     path('device_filter_tarih',device_filter_tarih,name="device_filter_tarih"),
     path('django_device',django_device,name="django_device"),
     path('django_device_backtest',django_device_backtest,name="django_device_backtest"),
+    path('arduino_serial',arduino_serial,name="arduino_serial")
     
 
 
