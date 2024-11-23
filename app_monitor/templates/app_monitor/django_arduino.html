@@ -281,6 +281,14 @@
     <td id="cihaz-port"></td>
   </tr>
   <tr>
+    <td>Server IP</td>
+    <td id="server-ip"></td>
+  </tr>
+  <tr>
+    <td>Default Gateway</td>
+    <td id="default-gateway"></td>
+  </tr>
+  <tr>
     <td>Sıcaklık</td>
     <td id="cihaz-sicaklik"></td>
   </tr>
@@ -342,6 +350,8 @@ $.ajax({
               document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
               document.getElementById("cihaz-adi").innerHTML=String(response.CihazAdi);
               document.getElementById("cihaz-ip").innerHTML=String(response.CihazIp);
+              document.getElementById("server-ip").innerHTML=String(response.ServerIp);
+              document.getElementById("default-gateway").innerHTML=String(response.AgGecidiIp);
               document.getElementById("cihaz-port").innerHTML=String(response.CihazPort);
               document.getElementById("cihaz-sicaklik").innerHTML=String(response.CihazSicaklik);
               document.getElementById("cihaz-nem").innerHTML=String(response.CihazNem);

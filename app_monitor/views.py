@@ -15,6 +15,7 @@ import serial
 import serial.tools.list_ports
 import time
 from django.contrib import messages #241115
+import json #241120
 
 
 # from django.contrib
@@ -386,54 +387,39 @@ def devices_all(request):
     return render(request,"app_monitor/devices_all.html",context)
 
 ######################USB-SERI-PORT-CONFIG######################
-def arduino_serial(request):
-    # arduino = serial.Serial(port='COM5',  baudrate=115200, timeout=.1)
-    # arduino.write(bytes(x,  'utf-8'))
-    # time.sleep(0.05)
-    # data = arduino.readline()
-    print(f"typeCOM port: {type(request.GET.get('comport'))}")
-    print(f"comport request: {request.GET.get('comport')}")
-    # if type(request.GET.get("comport"))!="<class 'NoneType'>":
-    if request.GET.get("comport")!=None:
-        comport=request.GET.get("comport")
-        print(f"comport: {comport}")
-    else:
-        comport="COMxx"
-        print(f"comport else: {comport}")
-    # if request.GET.get('serial_data') is not "" or None:
-    print(f"TYPE request.GET.get('serial_data'): {type(request.GET.get('serial_data'))}")
-    print(f"request.GET.get('serial_data'): {request.GET.get('serial_data')}")
-    if request.GET.get('serial_data')!=None: #241115 form inputları NoneType kontrolu***********************
-        data_browser=request.GET.get('serial_data')
-        print(f"tpye request.GET.get('serial_data'): {type(request.GET.get('serial_data'))}")
-        print(f"data_browser={data_browser}")
-    else:
-        data_browser=str(33)
-        print(f"if not serial data: {data_browser} ")
-        print(f"tpye(data_browser): {type(data_browser)}")
-    # num = input("Enter a number: ")
-    # value  = write_read(num)
-    # value  = int(write_read(data_browser))
-    # value  = write_read(data_browser)
-    value  = write_read(data_browser,comport)
-    # import serial.tools.list_ports
+def arduino_serial_local(request):
+
+    
+    value  = write_read() #241117
+    print(f"arduino value: {value}, type: {type(value)}")
+    print(f"arduino value CihazId: {value[0:10]}")
+    value_dict=json.loads(value)
+    # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
+    # value_dict=json.dumps(value)
+    print(f"value_dict:{value_dict},type:{type(value_dict)}")
     port_listesi=[]
     all_serial_ports=serial.tools.list_ports.comports()
     for port in list(serial.tools.list_ports.comports()):
-
         print(port[0])
         port_listesi.append(port[0])
     print(f"port listesi: {port_listesi}")
     myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
-    # myports = [tuple(p[0]) for p in list(serial.tools.list_ports.comports())]
-    # print (myports[0][0])
-    print(myports)
-    print(f"all serial ports: {all_serial_ports}")
+    # print(myports)
+    # print(f"all serial ports: {all_serial_ports}")
     context=dict(
         value=value,
-        comport=comport,
+        # comport=comport,
+        device_id=value_dict['CihazId'],
+        device_name=value_dict['CihazAdi'],
+        device_port=value_dict['CihazPort'],
+        device_ip=value_dict['CihazIp'],
+        server_ip=value_dict['ServerIp'],
+        ag_gecidi=value_dict['AgGecidi'],
+        # device_port=value_dict["device_port"],
+        # device_port=value_dict[0:5],
         myports=myports,
         port_listesi=port_listesi,
+        #port=port,
     )
     if value == None:
         messages.info(request,f"COM portunu hatalı girdiniz...<br>COM port değeri: {value}")
@@ -441,19 +427,48 @@ def arduino_serial(request):
     print(f"value: {value}")
     return render(request,"app_monitor/arduino_serial.html",context)
 
+def write_read():
 # def write_read(x):
-def write_read(x,comport):
+# def write_read(x,comport):
+    an=datetime.now()
+    # datetime_send=datetime.datetime.ctime(an)
+    datetime_send=datetime.strftime(an,'%c')
+    print(f"datetimesen tipi: {type(datetime_send)}")
     # arduino = serial.Serial(port='COM5',  baudrate=115200, timeout=.1)
     try:
+        comport="COM5"
         # arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
         # arduino = serial.Serial(port=comport,  baudrate=600, timeout=.1)
         print(f"arduino: {arduino}")
-        arduino.write(bytes(x,  'utf-8'))
+        # arduino.write(bytes(x,  'utf-8'))
+        an=datetime.now()
+        # datetime_send=datetime.datetime.ctime(an)
+        datetime_send=datetime.strftime(an,'%c')
+        print(f"datetimesen tipi: {type(datetime_send)}")
+        arduino.write(bytes(datetime_send,  'utf-8')) #butun config göster
+        # arduino.write(datetime_send)
+        # arduino.write(bytes("BARIS",  'utf-8'))
+        # arduino.write(bytearray('port\n','ascii'))
         time.sleep(0.05)
-        data = arduino.readline()
+        time.sleep(3)
+        # data = arduino.readline()
+        # if arduino.in_waiting > 0:
+        #     data = arduino.readline().decode('utf_8')
+        #     print(f"arduino.readline():{data}")
+        #     # data = arduino.read()[0]
+        #     # data = arduino.read(3)
+        #     arduino.close() #241117
+        #     return  data
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        # data = arduino.read()[0]
+        # data = arduino.read(3)
+        # arduino.close() #241117
         return  data
     except :
         print("FileNotFoundError exception oluştu")
+        # arduino.close() #241117
+        return "Exception Hata..."
 
         # raise Exception("COM portu yanlış giriyorsunuz...")
