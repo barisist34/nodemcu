@@ -387,12 +387,29 @@ def devices_all(request):
     return render(request,"app_monitor/devices_all.html",context)
 
 ######################USB-SERI-PORT-CONFIG######################
-def arduino_serial_local(request):
-
-    
-    value  = write_read() #241117
+def arduino_serial_local(request,config_parameter):
+    comport=request.GET.get("comport")
+    id=request.GET.get("cihaz-id")
+    name=request.GET.get("cihaz-adi")
+    serverip=request.GET.get("server-ip")
+    cihazip=request.GET.get("cihaz-ip")
+    print(f"comport:{comport}")
+    config_parameter=config_parameter
+    if config_parameter == "all":
+        value  = write_read(config_parameter) #241117
+    elif config_parameter == "id":
+        value  = write_read_id(id) #241117
+    elif config_parameter== "name":
+        value = write_read_name(name)
+    elif config_parameter== "serverip":
+        value = write_read_serverip(serverip)
+    elif config_parameter== "cihazip":
+        value = write_read_cihazip(cihazip)
+    # value  = write_read(comport,config_parameter) #241117
+    # value  = write_read(comport,config_parameter,id) #241117
+    # value  = write_read(config_parameter,id) #241123
     print(f"arduino value: {value}, type: {type(value)}")
-    print(f"arduino value CihazId: {value[0:10]}")
+    # print(f"arduino value CihazId: {value[0:10]}")
     value_dict=json.loads(value)
     # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
     # value_dict=json.dumps(value)
@@ -406,6 +423,7 @@ def arduino_serial_local(request):
     myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
     # print(myports)
     # print(f"all serial ports: {all_serial_ports}")
+    # try:
     context=dict(
         value=value,
         # comport=comport,
@@ -421,54 +439,161 @@ def arduino_serial_local(request):
         port_listesi=port_listesi,
         #port=port,
     )
+    # except KeyError:
+        # print("Arduinodan eksik key geldi...")
     if value == None:
         messages.info(request,f"COM portunu hatalı girdiniz...<br>COM port değeri: {value}")
 
     print(f"value: {value}")
     return render(request,"app_monitor/arduino_serial.html",context)
 
-def write_read():
-# def write_read(x):
-# def write_read(x,comport):
+# def write_read(*parametreler):
+def write_read(config_parameter):
     an=datetime.now()
-    # datetime_send=datetime.datetime.ctime(an)
     datetime_send=datetime.strftime(an,'%c')
     print(f"datetimesen tipi: {type(datetime_send)}")
-    # arduino = serial.Serial(port='COM5',  baudrate=115200, timeout=.1)
     try:
-        comport="COM5"
-        # arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
+        # comport="COM5"
+        comport=list(serial.tools.list_ports.comports())[0][0]
         arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
-        # arduino = serial.Serial(port=comport,  baudrate=600, timeout=.1)
         print(f"arduino: {arduino}")
-        # arduino.write(bytes(x,  'utf-8'))
         an=datetime.now()
-        # datetime_send=datetime.datetime.ctime(an)
         datetime_send=datetime.strftime(an,'%c')
-        print(f"datetimesen tipi: {type(datetime_send)}")
-        arduino.write(bytes(datetime_send,  'utf-8')) #butun config göster
-        # arduino.write(datetime_send)
-        # arduino.write(bytes("BARIS",  'utf-8'))
-        # arduino.write(bytearray('port\n','ascii'))
+        # print(f"datetimesen tipi: {type(datetime_send)}")
+        # if config_parameter == "all":
+        arduino.write(bytes("all",  'utf-8')) #butun config göster
+        # arduino.write(bytes("asd",  'utf-8')) #butun config göster
         time.sleep(0.05)
         time.sleep(3)
-        # data = arduino.readline()
-        # if arduino.in_waiting > 0:
-        #     data = arduino.readline().decode('utf_8')
-        #     print(f"arduino.readline():{data}")
-        #     # data = arduino.read()[0]
-        #     # data = arduino.read(3)
-        #     arduino.close() #241117
-        #     return  data
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
-        # data = arduino.read()[0]
-        # data = arduino.read(3)
-        # arduino.close() #241117
         return  data
     except :
         print("FileNotFoundError exception oluştu")
         # arduino.close() #241117
         return "Exception Hata..."
-
         # raise Exception("COM portu yanlış giriyorsunuz...")
+
+def write_read_id(id):
+    try:
+        id=id
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            id=id
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        # arduino_write_str=str(arduino_write)
+        # print(f"arduino_write:{arduino_write_str}")
+        # arduino.write(bytes("1",  'utf-8')) #butun config göster
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        # arduino.write(bytes("id",  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+        # return arduino_write_str
+        # return arduino_write_dumps
+        # return  "sabit return data"
+        # return  '{"CihazId":1,"CihazAdi":"M(t","CihazPort":90,"CihazIp":"(IP unset)","ServerIp":"192.168.43.130","AgGecidi":"192.168.1.1"}'
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_name(name):
+    try:
+        name=name
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            name=name
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        # arduino_write_str=str(arduino_write)
+        # print(f"arduino_write:{arduino_write_str}")
+        # arduino.write(bytes("1",  'utf-8')) #butun config göster
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        # arduino.write(bytes("id",  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+        # return arduino_write_str
+        # return arduino_write_dumps
+        # return  "sabit return data"
+        # return  '{"CihazId":1,"CihazAdi":"M(t","CihazPort":90,"CihazIp":"(IP unset)","ServerIp":"192.168.43.130","AgGecidi":"192.168.1.1"}'
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_serverip(serverip):
+    try:
+        serverip=serverip
+        serverip_array=serverip.split('.')
+        print(f"serverip_array: {serverip_array}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            serverip=serverip,
+            serverip_3=serverip_array[3],
+            serverip_2=serverip_array[2],
+            serverip_1=serverip_array[1],
+            serverip_0=serverip_array[0],
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        # arduino_write_str=str(arduino_write)
+        # print(f"arduino_write:{arduino_write_str}")
+        # arduino.write(bytes("1",  'utf-8')) #butun config göster
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        # arduino.write(bytes("id",  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+        # return arduino_write_str
+        # return arduino_write_dumps
+        # return  "sabit return data"
+        # return  '{"CihazId":1,"CihazAdi":"M(t","CihazPort":90,"CihazIp":"(IP unset)","ServerIp":"192.168.43.130","AgGecidi":"192.168.1.1"}'
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_cihazip(cihazip):
+    try:
+        cihazip=cihazip
+        cihazip_array=cihazip.split('.')
+        print(f"serverip_array: {cihazip_array}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            cihazip=cihazip,
+            cihazip_3=cihazip_array[3],
+            cihazip_2=cihazip_array[2],
+            cihazip_1=cihazip_array[1],
+            cihazip_0=cihazip_array[0],
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        # arduino_write_str=str(arduino_write)
+        # print(f"arduino_write:{arduino_write_str}")
+        # arduino.write(bytes("1",  'utf-8')) #butun config göster
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        # arduino.write(bytes("id",  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+        # return arduino_write_str
+        # return arduino_write_dumps
+        # return  "sabit return data"
+        # return  '{"CihazId":1,"CihazAdi":"M(t","CihazPort":90,"CihazIp":"(IP unset)","ServerIp":"192.168.43.130","AgGecidi":"192.168.1.1"}'
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."

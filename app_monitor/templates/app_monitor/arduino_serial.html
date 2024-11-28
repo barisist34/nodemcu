@@ -1,6 +1,8 @@
 {% extends "core/base.html" %}
 {% load static %}
 
+{% block title %} <title>CONFIG SAYFASI</title> {% endblock title %}
+
 {% block content %}
 
 <div class="container">
@@ -14,7 +16,7 @@
     {% endif %}
     
         <hr>
-        <form action="arduino_serial_local" method="get">
+        <form action="arduino_serial_local-all" method="get">
             <select name="comport" id="comport">
                 <option value="COM1" >COM1</option>
                 <option value="COM2">COM2</option>
@@ -33,7 +35,7 @@
     
     <hr>
     
-    <form action="arduino_serial" method="get">
+    <form action="arduino_serial/all" method="get">
     
     <input type="submit" value="GONDER">
     </form>
@@ -42,19 +44,19 @@
     {% if comport == "COMxx" %}
     <h3>COMPORT hatalı girdiniz... </h3>
     {% endif %}
-    <form action="/arduino_serial" method="get">
-        <input type="text" name="cihaz-id" id="cihaz-id" placeholder="Cihaz ID" value="{{device_id}} ">
+    <form action="arduino_serial_local-id" method="get">
+        <input type="text" name="cihaz-id" id="cihaz-id" placeholder="Cihaz ID" value="{{device_id}}">
         <input type="submit" value="Cihaz ID">
     </form>
-    <form action="/arduino_serial" method="get">
+    <form action="arduino_serial_local-name" method="get">
         <input type="text" name="cihaz-adi" id="cihaz-adi" placeholder="Cihaz Adı" value="{{device_name}}">
         <input type="submit" value="Cihaz Adı">
     </form>
-    <form action="/arduino_serial" method="get">
+    <form action="arduino_serial_local-serverip" method="get">
         <input type="text" name="server-ip" id="server-ip" placeholder="Server IP" value="{{server_ip}}">
         <input type="submit" value="Server IP">
     </form>
-    <form action="/arduino_serial" method="get">
+    <form action="arduino_serial_local-cihazip" method="get">
         <input type="text" name="cihaz-ip" id="cihaz-ip" placeholder="Cihaz IP" value="{{device_ip}}">
         <input type="submit" value="Cihaz IP">
     </form>

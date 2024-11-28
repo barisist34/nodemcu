@@ -31,7 +31,7 @@ urlpatterns=[
     path('device_filter_tarih',device_filter_tarih,name="device_filter_tarih"),
     path('django_device',django_device,name="django_device"),
     path('django_device_backtest',django_device_backtest,name="django_device_backtest"),
-    path('arduino_serial_local',arduino_serial_local,name="arduino_serial_local")
+    path('arduino_serial_local-<str:config_parameter>',arduino_serial_local,name="arduino_serial_local")
     
 
 
