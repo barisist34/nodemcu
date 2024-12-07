@@ -393,6 +393,10 @@ def arduino_serial_local(request,config_parameter):
     name=request.GET.get("cihaz-adi")
     serverip=request.GET.get("server-ip")
     cihazip=request.GET.get("cihaz-ip")
+    ssid=request.GET.get("cihaz-ssid")
+    password=request.GET.get('cihaz-password')
+    cihazport=request.GET.get("cihaz-port")
+    gatewayip=request.GET.get('default-gateway')
     print(f"comport:{comport}")
     config_parameter=config_parameter
     if config_parameter == "all":
@@ -405,42 +409,63 @@ def arduino_serial_local(request,config_parameter):
         value = write_read_serverip(serverip)
     elif config_parameter== "cihazip":
         value = write_read_cihazip(cihazip)
+    elif config_parameter== "gatewayip":
+        value = write_read_gatewayip(gatewayip)
+    elif config_parameter== "ssid":
+        value = write_read_ssid(ssid)
+    elif config_parameter== "password":
+        value = write_read_password(password)
+    elif config_parameter== "cihazport":
+        value = write_read_cihazport(cihazport)
+    elif config_parameter== "reset":
+        value = write_read_reset()
     # value  = write_read(comport,config_parameter) #241117
     # value  = write_read(comport,config_parameter,id) #241117
     # value  = write_read(config_parameter,id) #241123
     print(f"arduino value: {value}, type: {type(value)}")
     # print(f"arduino value CihazId: {value[0:10]}")
-    value_dict=json.loads(value)
-    # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
-    # value_dict=json.dumps(value)
-    print(f"value_dict:{value_dict},type:{type(value_dict)}")
-    port_listesi=[]
-    all_serial_ports=serial.tools.list_ports.comports()
-    for port in list(serial.tools.list_ports.comports()):
-        print(port[0])
-        port_listesi.append(port[0])
-    print(f"port listesi: {port_listesi}")
-    myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
-    # print(myports)
-    # print(f"all serial ports: {all_serial_ports}")
-    # try:
-    context=dict(
-        value=value,
-        # comport=comport,
-        device_id=value_dict['CihazId'],
-        device_name=value_dict['CihazAdi'],
-        device_port=value_dict['CihazPort'],
-        device_ip=value_dict['CihazIp'],
-        server_ip=value_dict['ServerIp'],
-        ag_gecidi=value_dict['AgGecidi'],
-        # device_port=value_dict["device_port"],
-        # device_port=value_dict[0:5],
-        myports=myports,
-        port_listesi=port_listesi,
-        #port=port,
-    )
+    try:
+        value_dict=json.loads(value)
+        # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
+        # value_dict=json.dumps(value)
+        print(f"value_dict:{value_dict},type:{type(value_dict)}")
+        port_listesi=[]
+        all_serial_ports=serial.tools.list_ports.comports()
+        for port in list(serial.tools.list_ports.comports()):
+            print(port[0])
+            port_listesi.append(port[0])
+        print(f"port listesi: {port_listesi}")
+        myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
+        # print(myports)
+        # print(f"all serial ports: {all_serial_ports}")
+        # try:
+        context=dict(
+            value=value,
+            # comport=comport,
+            device_id=value_dict['CihazId'],
+            device_name=value_dict['CihazAdi'],
+            device_port=value_dict['CihazPort'],
+            device_ip=value_dict['CihazIp'],
+            server_ip=value_dict['ServerIp'],
+            device_ssid=value_dict['CihazSSID'],
+            device_password=value_dict['CihazPassword'],
+            ag_gecidi=value_dict['AgGecidi'],
+            # reset_ok=value_dict['ResetOk'],
+
+            # device_port=value_dict["device_port"],
+            # device_port=value_dict[0:5],
+            myports=myports,
+            port_listesi=port_listesi,
+            #port=port,
+        )
     # except KeyError:
         # print("Arduinodan eksik key geldi...")
+    except :
+        print("Arduinodan eksik key geldi...")
+        context=dict(
+            device_id="Veri okunamadı",
+            device_name="Veri okunamadı",
+        )
     if value == None:
         messages.info(request,f"COM portunu hatalı girdiniz...<br>COM port değeri: {value}")
 
@@ -467,6 +492,7 @@ def write_read(config_parameter):
         time.sleep(3)
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
+        arduino.close()  ##### CLOSE() yapılmazsa bazen hata alınıyor.......Expecting value: line 1 column 1 (char 0)
         return  data
     except :
         print("FileNotFoundError exception oluştu")
@@ -493,6 +519,7 @@ def write_read_id(id):
         time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
+        arduino.close()
         return  data
         # return arduino_write_str
         # return arduino_write_dumps
@@ -597,3 +624,118 @@ def write_read_cihazip(cihazip):
     except :
         print("FileNotFoundError exception oluştu")
         return "Exception Hata..."
+
+def write_read_gatewayip(gatewayip):
+    try:
+        gatewayip=gatewayip
+        gatewayip_array=gatewayip.split('.')
+        print(f"gatewayip_array: {gatewayip_array}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            gatewayip=gatewayip,
+            gatewayip_3=gatewayip_array[3],
+            gatewayip_2=gatewayip_array[2],
+            gatewayip_1=gatewayip_array[1],
+            gatewayip_0=gatewayip_array[0],
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        # arduino_write_str=str(arduino_write)
+        # print(f"arduino_write:{arduino_write_str}")
+        # arduino.write(bytes("1",  'utf-8')) #butun config göster
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        # arduino.write(bytes("id",  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+        # return arduino_write_str
+        # return arduino_write_dumps
+        # return  "sabit return data"
+        # return  '{"CihazId":1,"CihazAdi":"M(t","CihazPort":90,"CihazIp":"(IP unset)","ServerIp":"192.168.43.130","AgGecidi":"192.168.1.1"}'
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_ssid(ssid):
+    try:
+        ssid=ssid
+        # ssid="aaaaaaaa"
+        print(f"ssid: {ssid}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            SSID=ssid,
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_password(password):
+    try:
+        password=password
+        # password="aaaaaaaa"
+        print(f"password: {password}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            password=password,
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        return  data
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+
+def write_read_cihazport(cihazport):
+    try:
+        cihazport=cihazport
+        # cihazport="aaaaaaaa"
+        print(f"cihazport: {cihazport}")
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        print(f"arduino: {arduino}")
+        arduino_write=dict(
+            cihazport=cihazport,
+        )
+        arduino_write_dumps=json.dumps(arduino_write)
+        print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+        arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}")
+        arduino.close()
+        return  data
+    except :
+        print("FileNotFoundError exception oluştu")
+        return "Exception Hata..."
+def write_read_reset():
+    comport=list(serial.tools.list_ports.comports())[0][0]
+    arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+    arduino_write=dict(
+        reset="reset"
+    )
+    arduino_write_dumps=json.dumps(arduino_write)
+    print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
+    arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
+    time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+    data = arduino.readline().decode('utf_8')
+    print(f"arduino.readline():{data}")
+    return  data  
+

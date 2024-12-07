@@ -314,6 +314,11 @@
       <span id="cikis2-span"></span>
     </td>
   </tr>
+  <tr>
+    <td>Sinyal Seviye</td>
+    <td id="cihaz-rssi">
+    </td>
+  </tr>
 
 </table>
 
@@ -327,7 +332,7 @@ $.ajax({
               //url: 'http://81.214.131.122:90/django_device',
               //url: 'http://81.214.131.122:{{device_port}}/django_device',
               //url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/django_device',
-              url: 'http://192.168.1.33:{{device_port}}/django_device',
+              url: 'http://192.168.1.43:{{device_port}}/django_device',
               //url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
               // type: 'POST',
               type: 'GET',
@@ -357,6 +362,7 @@ $.ajax({
               document.getElementById("cihaz-sicaklik").innerHTML=String(response.CihazSicaklik);
               document.getElementById("cihaz-nem").innerHTML=String(response.CihazNem);
               document.getElementById("cihaz-voltaj").innerHTML=String(response.CihazVoltaj);
+              document.getElementById("cihaz-rssi").innerHTML=String(response.CihazRssi)+" dBm";
               if (String(response.CihazCikis1) == "1") {
                   document.getElementById("cikis1-span").innerHTML= "Çıkış Açık";
                   document.getElementById("cikis1-buton").innerHTML="Kapat";

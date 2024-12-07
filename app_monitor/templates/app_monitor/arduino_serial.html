@@ -31,7 +31,7 @@
             </select>
             <input type="submit" value="VERILERI AL">
         </form>
-    <h3>ARDUINO dan gelen veri: {{value}} </h3>
+    <h6>ARDUINO dan gelen veri: {{value}} </h6>
     
     <hr>
     
@@ -44,30 +44,42 @@
     {% if comport == "COMxx" %}
     <h3>COMPORT hatalı girdiniz... </h3>
     {% endif %}
-    <form action="arduino_serial_local-id" method="get">
+    <form action="arduino_serial_local-id" method="get" class="mt-2">
         <input type="text" name="cihaz-id" id="cihaz-id" placeholder="Cihaz ID" value="{{device_id}}">
         <input type="submit" value="Cihaz ID">
     </form>
-    <form action="arduino_serial_local-name" method="get">
+    <form action="arduino_serial_local-name" method="get" class="mt-2">
         <input type="text" name="cihaz-adi" id="cihaz-adi" placeholder="Cihaz Adı" value="{{device_name}}">
         <input type="submit" value="Cihaz Adı">
     </form>
-    <form action="arduino_serial_local-serverip" method="get">
+    <form action="arduino_serial_local-serverip" method="get" class="mt-2">
         <input type="text" name="server-ip" id="server-ip" placeholder="Server IP" value="{{server_ip}}">
         <input type="submit" value="Server IP">
     </form>
-    <form action="arduino_serial_local-cihazip" method="get">
+    <form action="arduino_serial_local-cihazip" method="get" class="mt-2">
         <input type="text" name="cihaz-ip" id="cihaz-ip" placeholder="Cihaz IP" value="{{device_ip}}">
         <input type="submit" value="Cihaz IP">
     </form>
-    <form action="/arduino_serial" method="get">
-        <input type="text" name="port" id="port" placeholder="Port" value="{{device_port}}">
+    <form action="arduino_serial_local-cihazport" method="get" class="mt-2">
+        <input type="text" name="cihaz-port" id="cihaz-port" placeholder="Port" value="{{device_port}}">
         <input type="submit" value="PORT">
     </form>
-    <form action="/arduino_serial" method="get">
+    <form action="arduino_serial_local-gatewayip" method="get" class="mt-2">
         <input type="text" name="default-gateway" id="default-gateway" placeholder="Default Gateway" value="{{ag_gecidi}}">
         <input type="submit" value="Default Gateway">
     </form>
+    <form action="arduino_serial_local-ssid" method="get" class="mt-2">
+        <input type="text" name="cihaz-ssid" id="ssid" placeholder="SSID" value="{{device_ssid}}">
+        <input type="submit" value="SSID">
+    </form>
+    <form action="arduino_serial_local-password" method="get" class="mt-2">
+        <input type="text" name="cihaz-password" id="password" placeholder="Password" value="{{device_password}}">
+        <input type="submit" value="Password">
+    </form>
+    <br>
+    <button class="btn btn-danger"><a href="arduino_serial_local-reset" class="text-white text-decoration-none">CIHAZ RESET</a></button>
+    <br>
+    <h4>{{reset_ok}} </h4>
     
     <h5>BAĞLI PORTLAR</h5>
     <h6>{{port_listesi}} </h6>
