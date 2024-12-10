@@ -96,12 +96,26 @@
 <div class="row">
 
         <div class="col-sm-10 offset-sm-1">
+          <div class="row">
+            <div class="col-sm-6">
             <b>Kayıtlar: {{kayit_araligi}} </b> / <b>Sıcaklık: {{sicaklik1}} -- {{sicaklik2}} </b>  
             /<b>Nem: {{nem1}} -- {{nem2}} </b>/<b>Voltaj: {{voltaj1}} -- {{voltaj2}} </b><br>
             <b>Tarih: {{tarih1}} -- {{tarih2}} </b>
             <br>
             <b>Kayıt Sayısı: {{kayit_sayisi_filter}} {{device_search_count}}</b> <br> <!--  gelen fonksiyona göre kayıt sayılarından biri aktif olur (deviceView veya device_filter_*****) -->
             <b>Device ID: {{device_id_dizi}} </b> <br> <!--  gelen fonksiyona göre kayıt sayılarından biri aktif olur (deviceView veya device_filter_*****) -->
+          </div>
+            <div class="col-sm-6 d-flex align-items-end ">
+              <div class="col-sm-12 text-center d-flex justify-content-end">
+                <form action="/app_monitor/django_device" method="get"  class=" ">
+                  <input hidden class="w-25" type="text" name="name-port"  value="{{device_port}}">
+                  {% comment %} <input type="text" name="device_name"  value="{{device_name}}"> {% endcomment %}
+                <!-- <su type="submit">{{device_name}} </button> -->
+                 <input class="btn btn-primary"  type="submit" name="device_name" value="{{device_name}}">
+              </form>
+              </div>
+            </div>
+          </div>
                <table class="table">
               <thead>
                  <tr>
@@ -261,14 +275,7 @@
         </div> <!--  chart row  -->
         <br>
         <div class="row">
-          <div class="col-sm-12 text-center">
-            <form action="/app_monitor/django_device" method="get" >
-              <input type="text" name="name-port"  value="{{device_port}}">
-              {% comment %} <input type="text" name="device_name"  value="{{device_name}}"> {% endcomment %}
-            <!-- <su type="submit">{{device_name}} </button> -->
-             <input type="submit" name="device_name" value="{{device_name}} ">
-          </form>
-          </div>
+
           <div class="col-sm12 text-center fw-bold mb-3"><a href="/app_monitor" target="_blank">Anasayfa</a></div> <!--  241013  -->
         </div>
 </div>

@@ -233,9 +233,11 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-8 offset-2">
+<div class="row">
+  <div class="col-sm-6"><h2>{{device_name}} </h2></div>
+  <div class="col-sm-6 "><h2 class="d-flex justify-content-end "> <a class="text-decoration-none" href="/app_monitor/cihazlar/{{device_name}}/port={{device_port}}">{{device_name}} Kayıtlar </a> </h2></div>
+</div>
 
-<h2>{{device_name}} </h2>
-<div id="test" class="test">TEST AJAX DIV</div>
 <table class="table">
   <th>Parametre</th>
   <th>Değer</th>
@@ -319,6 +321,11 @@
     <td id="cihaz-rssi">
     </td>
   </tr>
+  <tr>
+    <td>Cihaz Çalışma Süresi</td>
+    <td id="cihaz-uptime">
+    </td>
+  </tr>
 
 </table>
 
@@ -363,6 +370,7 @@ $.ajax({
               document.getElementById("cihaz-nem").innerHTML=String(response.CihazNem);
               document.getElementById("cihaz-voltaj").innerHTML=String(response.CihazVoltaj);
               document.getElementById("cihaz-rssi").innerHTML=String(response.CihazRssi)+" dBm";
+              document.getElementById("cihaz-uptime").innerHTML=String(response.CihazUpTime);
               if (String(response.CihazCikis1) == "1") {
                   document.getElementById("cikis1-span").innerHTML= "Çıkış Açık";
                   document.getElementById("cikis1-buton").innerHTML="Kapat";

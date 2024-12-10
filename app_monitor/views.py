@@ -76,7 +76,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
             print(f" {device_name}:  device_id database de olmayan blok girdi... ")
             device_id_request=request.GET.get("device_id")
             device_ip_request=request.GET.get("device_ip")
-            device_port_request=request.GET.get("device_port")
+            device_port_request=request.GET.get("device_port")            
             new_device=Device(device_id=device_id_request,device_name=device_name,device_port=device_port_request,device_ip=device_ip_request)
             new_device.save()
             print(f"new_device: {new_device}")
@@ -92,7 +92,11 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
             new_device.save()
             print(f"new_device: {new_device}")
             print(f"new device name: {new_device.device_name}")
-        
+        device_port_request=request.GET.get("device_port") 
+        device_check=Device.objects.get(device_id=device_id_request)
+        if device_check.device_port !=int(device_port_request):
+            device_check.device_port=int(device_port_request)
+            device_check.save()
         
         # device_id=Device.objects.get(device_name__icontains=device_name) #241013, device_id Device örneği olmalı, Foreignkey
         device_id_request=request.GET.get("device_id")
@@ -131,10 +135,10 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
 # def deviceView(request,str_device_name):
 def deviceView(request,str_device_name,port_no):
 # def deviceView(request,str_device_name): # parametrelerin sırası ÖNEMLİ
-    deviceAll=Temperature.objects.filter(device_name=str_device_name).order_by('-id')
-    device=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:10]
+    deviceAll=Temperature.objects.filter(device_name__iexact=str_device_name).order_by('-id')
+    device=Temperature.objects.filter(device_name__iexact=str_device_name).order_by('-id')[:10]
     # device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
-    device500=Temperature.objects.filter(device_name=str_device_name).order_by('-id')[:500]
+    device500=Temperature.objects.filter(device_name__iexact=str_device_name).order_by('-id')[:500]
     # device_port=Device.objects.get(device_name=str_device_name).device_port
     device_port=port_no
     device_id_dizi=[]
@@ -373,7 +377,7 @@ def devices_all(request):
     # print(f"datetime.now(){datetime_now}")
     # print(f"timestamp now {datetime.timestamp(datetime_now)}")
     for device in devices_all:
-        if datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) < 60:
+        if datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) < 360:
             devices_online.append(device.temperature_set.last().device_id.device_id)
 
             print(f"datetime_now- device.temperature_set.last.date() {device.temperature_set.last().device_id}: {datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) }")
@@ -401,34 +405,8 @@ def arduino_serial_local(request,config_parameter):
     config_parameter=config_parameter
     if config_parameter == "all":
         value  = write_read(config_parameter) #241117
-    elif config_parameter == "id":
-        value  = write_read_id(id) #241117
-    elif config_parameter== "name":
-        value = write_read_name(name)
-    elif config_parameter== "serverip":
-        value = write_read_serverip(serverip)
-    elif config_parameter== "cihazip":
-        value = write_read_cihazip(cihazip)
-    elif config_parameter== "gatewayip":
-        value = write_read_gatewayip(gatewayip)
-    elif config_parameter== "ssid":
-        value = write_read_ssid(ssid)
-    elif config_parameter== "password":
-        value = write_read_password(password)
-    elif config_parameter== "cihazport":
-        value = write_read_cihazport(cihazport)
-    elif config_parameter== "reset":
-        value = write_read_reset()
-    # value  = write_read(comport,config_parameter) #241117
-    # value  = write_read(comport,config_parameter,id) #241117
-    # value  = write_read(config_parameter,id) #241123
-    print(f"arduino value: {value}, type: {type(value)}")
-    # print(f"arduino value CihazId: {value[0:10]}")
-    try:
+        print(f"arduino value: {value}, type: {type(value)}")
         value_dict=json.loads(value)
-        # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
-        # value_dict=json.dumps(value)
-        print(f"value_dict:{value_dict},type:{type(value_dict)}")
         port_listesi=[]
         all_serial_ports=serial.tools.list_ports.comports()
         for port in list(serial.tools.list_ports.comports()):
@@ -436,36 +414,134 @@ def arduino_serial_local(request,config_parameter):
             port_listesi.append(port[0])
         print(f"port listesi: {port_listesi}")
         myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
-        # print(myports)
-        # print(f"all serial ports: {all_serial_ports}")
-        # try:
+        print(myports)
+        print(f"all serial ports: {all_serial_ports}")
         context=dict(
-            value=value,
-            # comport=comport,
-            device_id=value_dict['CihazId'],
-            device_name=value_dict['CihazAdi'],
-            device_port=value_dict['CihazPort'],
-            device_ip=value_dict['CihazIp'],
-            server_ip=value_dict['ServerIp'],
-            device_ssid=value_dict['CihazSSID'],
-            device_password=value_dict['CihazPassword'],
-            ag_gecidi=value_dict['AgGecidi'],
-            # reset_ok=value_dict['ResetOk'],
+        value=value,
+        device_id=value_dict['CihazId'],
+        device_name=value_dict['CihazAdi'],
+        device_port=value_dict['CihazPort'],
+        device_ip=value_dict['CihazIp'],
+        server_ip=value_dict['ServerIp'],
+        device_ssid=value_dict['CihazSSID'],
+        device_password=value_dict['CihazPassword'],
+        ag_gecidi=value_dict['AgGecidi'],
+        myports=myports,
+        port_listesi=port_listesi,
+    )
+    elif config_parameter == "id":
+        value  = write_read_id(id) #241117
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_id=value_dict['CihazId'],
+        )
+    elif config_parameter== "name":
+        value = write_read_name(name)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_name=value_dict['CihazAdi'],
+        )
+    elif config_parameter== "serverip":
+        value = write_read_serverip(serverip)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        server_ip=value_dict['ServerIp'],
+        )       
+    elif config_parameter== "cihazip":
+        value = write_read_cihazip(cihazip)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_ip=value_dict['CihazIp'],
+        )    
+    elif config_parameter== "gatewayip":
+        value = write_read_gatewayip(gatewayip)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        ag_gecidi=value_dict['AgGecidi'],
+        )
+    elif config_parameter== "ssid":
+        value = write_read_ssid(ssid)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_ssid=value_dict['CihazSSID'],
+        )  
+    elif config_parameter== "password":
+        value = write_read_password(password)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_password=value_dict['CihazPassword'],
+        )
+    elif config_parameter== "cihazport":
+        value = write_read_cihazport(cihazport)
+        print(f"arduino value: {value}, type: {type(value)}")
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_port=value_dict['CihazPort'],
+        )        
+    elif config_parameter== "reset":
+        value = write_read_reset()
+    # value  = write_read(comport,config_parameter) #241117
+    # value  = write_read(comport,config_parameter,id) #241117
+    # value  = write_read(config_parameter,id) #241123
+    print(f"arduino value: {value}, type: {type(value)}")
+    # print(f"arduino value CihazId: {value[0:10]}")
+    ## try:
+    #     value_dict=json.loads(value)
+    #     # value_dict=json.loads(value).strip("'<>() ").replace('\'', '\"')
+    #     # value_dict=json.dumps(value)
+    #     print(f"value_dict:{value_dict},type:{type(value_dict)}")
+    #     port_listesi=[]
+    #     all_serial_ports=serial.tools.list_ports.comports()
+    #     for port in list(serial.tools.list_ports.comports()):
+    #         print(port[0])
+    #         port_listesi.append(port[0])
+    #     print(f"port listesi: {port_listesi}")
+    #     myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
+    #     # print(myports)
+    #     # print(f"all serial ports: {all_serial_ports}")
+    #     # try:
+    #     context=dict(
+    #         value=value,
+    #         # comport=comport,
+    #         device_id=value_dict['CihazId'],
+    #         device_name=value_dict['CihazAdi'],
+    #         device_port=value_dict['CihazPort'],
+    #         device_ip=value_dict['CihazIp'],
+    #         server_ip=value_dict['ServerIp'],
+    #         device_ssid=value_dict['CihazSSID'],
+    #         device_password=value_dict['CihazPassword'],
+    #         ag_gecidi=value_dict['AgGecidi'],
+    #         # reset_ok=value_dict['ResetOk'],
 
-            # device_port=value_dict["device_port"],
-            # device_port=value_dict[0:5],
-            myports=myports,
-            port_listesi=port_listesi,
-            #port=port,
-        )
-    # except KeyError:
-        # print("Arduinodan eksik key geldi...")
-    except :
-        print("Arduinodan eksik key geldi...")
-        context=dict(
-            device_id="Veri okunamadı",
-            device_name="Veri okunamadı",
-        )
+    #         # device_port=value_dict["device_port"],
+    #         # device_port=value_dict[0:5],
+    #         myports=myports,
+    #         port_listesi=port_listesi,
+    #         #port=port,
+    #     )
+    # # except KeyError:
+    #     # print("Arduinodan eksik key geldi...")
+    # except :
+    #     print("Arduinodan eksik key geldi...")
+    #     context=dict(
+    #         device_id="Veri okunamadı",
+    #         device_name="Veri okunamadı",
+    #     )
     if value == None:
         messages.info(request,f"COM portunu hatalı girdiniz...<br>COM port değeri: {value}")
 
@@ -480,7 +556,8 @@ def write_read(config_parameter):
     try:
         # comport="COM5"
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        # arduino = serial.Serial(port=comport,  baudrate=115200, timeout=1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=1)
         print(f"arduino: {arduino}")
         an=datetime.now()
         datetime_send=datetime.strftime(an,'%c')
@@ -488,6 +565,7 @@ def write_read(config_parameter):
         # if config_parameter == "all":
         arduino.write(bytes("all",  'utf-8')) #butun config göster
         # arduino.write(bytes("asd",  'utf-8')) #butun config göster
+        print("arduino.write all parametresiyle çalıştı,alt satırı burası...")
         time.sleep(0.05)
         time.sleep(3)
         data = arduino.readline().decode('utf_8')
@@ -504,7 +582,7 @@ def write_read_id(id):
     try:
         id=id
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             id=id
@@ -533,7 +611,7 @@ def write_read_name(name):
     try:
         name=name
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             name=name
@@ -563,7 +641,7 @@ def write_read_serverip(serverip):
         serverip_array=serverip.split('.')
         print(f"serverip_array: {serverip_array}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             serverip=serverip,
@@ -597,7 +675,7 @@ def write_read_cihazip(cihazip):
         cihazip_array=cihazip.split('.')
         print(f"serverip_array: {cihazip_array}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             cihazip=cihazip,
@@ -631,7 +709,7 @@ def write_read_gatewayip(gatewayip):
         gatewayip_array=gatewayip.split('.')
         print(f"gatewayip_array: {gatewayip_array}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             gatewayip=gatewayip,
@@ -665,7 +743,7 @@ def write_read_ssid(ssid):
         # ssid="aaaaaaaa"
         print(f"ssid: {ssid}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             SSID=ssid,
@@ -687,7 +765,7 @@ def write_read_password(password):
         # password="aaaaaaaa"
         print(f"password: {password}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             password=password,
@@ -709,7 +787,7 @@ def write_read_cihazport(cihazport):
         # cihazport="aaaaaaaa"
         print(f"cihazport: {cihazport}")
         comport=list(serial.tools.list_ports.comports())[0][0]
-        arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
         print(f"arduino: {arduino}")
         arduino_write=dict(
             cihazport=cihazport,
@@ -727,7 +805,7 @@ def write_read_cihazport(cihazport):
         return "Exception Hata..."
 def write_read_reset():
     comport=list(serial.tools.list_ports.comports())[0][0]
-    arduino = serial.Serial(port=comport,  baudrate=115200, timeout=.1)
+    arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.1)
     arduino_write=dict(
         reset="reset"
     )
