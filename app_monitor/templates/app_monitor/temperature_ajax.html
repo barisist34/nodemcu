@@ -1,6 +1,5 @@
 
 
-<b> DEĞERLER TABLOSU</b><br>
 <b>Kayıt Sayısı : </b>{{kayit_sayisi_total_ajax}} <br>
 <b id="saat"> </b><br>
    <table class="table">
@@ -13,6 +12,7 @@
        <th scope="col">Nem</th>
        <th scope="col">Voltaj</th>
        <th scope="col">Tarih</th>
+       <th scope="col">Açıklama</th>
      </tr>
    </thead>
  <tbody>
@@ -39,9 +39,44 @@
      <td >{{temp.temperature}}</td>
      <td >{{temp.humidity}}</td>
      <td >{{temp.volcum}}</td>
-    <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
-      <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
-       {% endif %}
+     <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+     <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+     <td >
+      {% comment %} <button type="button" data-bs-toggle="modal" data-bs-target="#modal1" data-bs-toggle="modal">...</button> {% endcomment %}
+      <button type="button" data-bs-toggle="modal" data-bs-target="#modal{{temp.id}}" data-bs-toggle="modal">...</button>
+      <span class="d-inline-block text-truncate" style="max-width: 150px;" >{{temp.additionalText}}</span>
+      {% comment %} <div class="modal" id="modal1" data-bs-backdrop="static"> {% endcomment %}
+      <div class="modal" id="modal{{temp.id}}" data-bs-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">ID:{{temp.id}},Cihaz Adı:{{temp.device_name}}  </h4>
+              {% comment %} <button class="close">kapat</button> {% endcomment %}
+              <button type="button" class="close" data-bs-dismiss="modal">&times;</button> <!-- data-dismiss değil data-bs-dismiss OLMALI -->  
+            </div>
+            <form action="/app_monitor/additional_text">
+            <div class="modal-body">
+                <div class="mb-3">
+                  <label for="acknowledge">Açıklama</label>
+                  <textarea class="form-control" name="additional_text" id="additional_text" rows="5" >{{temp.additionalText}}</textarea>
+                  {% comment %} <label id="modal_id" for="" name="{{modal_id}}" hidden>{{temp.id}} </label> {% endcomment %}
+                  <input hidden type="text" name="temp_id" value="{{temp.id}} ">
+                  <input hidden type="text" name="temp_user" value="{{request.user.username}} ">
+                </div>
+              </div>
+              <div class="modal-footer">
+                {% comment %} <button  class="btn btn-secondary" data-bs-dismiss="modal">Sil</button> {% endcomment %}
+                <a class="btn btn-secondary" href="/app_monitor/additional_text_sil/{{temp.id}}" > Sil</a>
+                <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="modal_kaydet">Kaydet </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </td>
+     <!-- Scrollable modal -->
+
+     {% endif %}
    
    </tr>  
 
@@ -50,3 +85,61 @@
  </tbody>
 </table>
 <br>
+
+<script>
+  document.getElementById('modal_kaydet').addEventListener('click',function(){
+    $.ajax({        
+      //url: 'http://81.214.131.122:90/django_device',
+      //url: 'http://81.214.131.122:{{device_port}}/django_device',
+      //url: 'http://{{cihazlar_erisim_ip}}:{{device_port}}/django_device',
+      url: 'http://localhost:9000/additional_text/{{tem}}',
+      //url: 'http://192.168.43.166:{{device_port}}/django_device', // a6wifi - casper laptop
+      // type: 'POST',
+      type: 'GET',
+      data:{
+       
+      //SicaklikKayit:SicaklikKayit,
+      // csrfmiddlewaretoken: '{{ csrf_token }}',
+      // dataType: "json",
+      },
+      // beforeSend: function (xhr){
+      //   xhr.setRequestHeader('X-CSRFToken', csrftoken);
+      // },
+      success: function(response){
+        //alert("arduino success girdi...");
+        console.log("ajax success girdi...");
+        console.log(response);
+      //$('#test').html(response);
+      console.log(response.No);
+      var numara=response.No;
+      console.log(typeof response.No);
+      document.getElementById("cihaz-id").innerHTML=String(response.CihazId);
+      document.getElementById("cihaz-adi").innerHTML=String(response.CihazAdi);
+      document.getElementById("cihaz-ip").innerHTML=String(response.CihazIp);
+      document.getElementById("server-ip").innerHTML=String(response.ServerIp);
+      document.getElementById("default-gateway").innerHTML=String(response.AgGecidiIp);
+      document.getElementById("cihaz-port").innerHTML=String(response.CihazPort);
+      document.getElementById("cihaz-sicaklik").innerHTML=String(response.CihazSicaklik);
+      document.getElementById("cihaz-nem").innerHTML=String(response.CihazNem);
+      document.getElementById("cihaz-voltaj").innerHTML=String(response.CihazVoltaj);
+      document.getElementById("cihaz-rssi").innerHTML=String(response.CihazRssi)+" dBm";
+      document.getElementById("cihaz-uptime").innerHTML=String(response.CihazUpTime);
+      if (String(response.CihazCikis1) == "1") {
+          document.getElementById("cikis1-span").innerHTML= "Çıkış Açık";
+          document.getElementById("cikis1-buton").innerHTML="Kapat";
+          }
+          else {
+          document.getElementById("cikis1-span").innerHTML= "Çıkış Kapalı";
+          document.getElementById("cikis1-buton").innerHTML="Aç";            
+
+          }
+
+      },
+                      failure: function() {
+                  //alert("ajax reverse fail geldi");
+                  console.log("ajax failure girdi...")
+                    }               
+  });
+  })
+</script>
+

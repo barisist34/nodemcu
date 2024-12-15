@@ -127,6 +127,7 @@
                    <th scope="col">Nem</th>
                    <th scope="col">Voltaj</th>
                    <th scope="col">Tarih</th>            
+                   <th scope="col">Açıklama</th>            
                  </tr>
                </thead>
              <tbody>
@@ -153,9 +154,44 @@
                  <td >{{temp.temperature}}</td>
                  <td >{{temp.humidity}}</td>
                  <td >{{temp.volcum}}</td>
-
-                <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
-                  <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+                 
+                 <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+                 <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+                 <td >
+                  <button type="button" data-bs-toggle="modal" data-bs-target="#modal{{temp.id}}" data-bs-toggle="modal">...</button>
+                  <span class="d-inline-block text-truncate" style="max-width: 150px;" >{{temp.additionalText}}</span>
+                  {% comment %} <div class="modal" id="modal1" data-bs-backdrop="static"> {% endcomment %}
+                  <div class="modal" id="modal{{temp.id}}" data-bs-backdrop="static">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">ID:{{temp.id}},Cihaz Adı:{{temp.device_name}}  </h4>
+                          {% comment %} <button class="close">kapat</button> {% endcomment %}
+                          <button type="button" class="close" data-bs-dismiss="modal">&times;</button> <!-- data-dismiss değil data-bs-dismiss OLMALI -->  
+                        </div>
+                        <form action="/app_monitor/additional_text">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                              <label for="acknowledge">Açıklama</label>
+                              <textarea class="form-control" name="additional_text" id="additional_text" rows="5" >{{temp.additionalText}}</textarea>
+                              {% comment %} <label id="modal_id" for="" name="{{modal_id}}" hidden>{{temp.id}} </label> {% endcomment %}
+                              <input hidden type="text" name="temp_id" value="{{temp.id}} ">
+                              <input hidden type="text" name="temp_user" value="{{request.user.username}} ">
+                              <input hidden type="text" name="temp_template" value="device.html">
+                              <input hidden type="text" name="device_name" value="{{temp.device_name}}">
+                              <input hidden type="text" name="device_port" value="{{temp.device_id.device_port}}">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            {% comment %} <button  class="btn btn-secondary" data-bs-dismiss="modal">Sil</button> {% endcomment %}
+                            <a class="btn btn-secondary" href="/app_monitor/additional_text_sil/{{temp.id}}" > Sil</a>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="modal_kaydet">Kaydet </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </td>
                   
             
                    {% endif %}

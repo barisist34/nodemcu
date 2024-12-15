@@ -8,6 +8,7 @@ urlpatterns = [
     path('app_monitor/',include("app_monitor.urls")),
     path('app_monitor/ilk_def',ilk_def,name="ilk_def"),
     path('addRecordArduino',addRecordArduino,name="addRecordArduino"),
-
+    #USER
+    path("user/",include('app_user_profile.urls',namespace="app_user_profile")  ),
 
 ]

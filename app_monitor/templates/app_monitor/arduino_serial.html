@@ -31,16 +31,16 @@
             </select>
             <input type="submit" value="VERILERI AL">
         </form>
-    <h6>ARDUINO dan gelen veri: {{value}} </h6>
+    {% comment %} <h6>Cihazdan gelen veri: {{value}} </h6> {% endcomment %}
     
     <hr>
-    
+{% comment %}     
     <form action="arduino_serial/all" method="get">
     
     <input type="submit" value="GONDER">
     </form>
     
-    COMPORT = {{comport}}
+    COMPORT = {{comport}} {% endcomment %}
     {% if comport == "COMxx" %}
     <h3>COMPORT hatalı girdiniz... </h3>
     {% endif %}

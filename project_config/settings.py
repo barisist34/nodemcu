@@ -50,6 +50,7 @@ FIXED_APPS = [
 
 MY_APPS=[
     'app_monitor',
+    'app_user_profile',
 ]
 
 INSTALLED_APPS= FIXED_APPS + MY_APPS

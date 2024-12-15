@@ -240,7 +240,7 @@ def export_to_excel(request):
     ws.title = cihazadi
 
     # Add headers
-    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum"]
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum","TARIH","ACIKLAMA"]
     ws.append(headers)
 
     # Add data from the model
@@ -255,7 +255,7 @@ def export_to_excel(request):
         temp = Temperature.objects.filter(device_name__iexact=cihazadi) #iexact kullanıldı exact değil
         # temp = Temperature.objects.filter(device_name=cihazadi)
     for temps in temp:
-        ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum])
+        ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum,temps.date,temps.additionalText])
 
     # Save the workbook to the HttpResponse
     wb.save(response)
@@ -277,7 +277,7 @@ def export_to_excel_all(request):
     ws.title = "ALL"
 
     # Add headers
-    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum"]
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum","TARIH","ACIKLAMA"]
     ws.append(headers)
 
 
@@ -285,7 +285,7 @@ def export_to_excel_all(request):
         # temp = Temperature.objects.filter(device_name=cihazadi)
     for temps in temp:
         try:
-            ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum])
+            ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum,temps.date,temps.additionalText])
             # ws.append([temps.id,temps.device_name,temps.temperature, temps.humidity, temps.volcum])
         except AttributeError:
             print("AttributeError oluştu...")
@@ -406,7 +406,6 @@ def arduino_serial_local(request,config_parameter):
     if config_parameter == "all":
         value  = write_read(config_parameter) #241117
         print(f"arduino value: {value}, type: {type(value)}")
-        value_dict=json.loads(value)
         port_listesi=[]
         all_serial_ports=serial.tools.list_ports.comports()
         for port in list(serial.tools.list_ports.comports()):
@@ -416,19 +415,37 @@ def arduino_serial_local(request,config_parameter):
         myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
         print(myports)
         print(f"all serial ports: {all_serial_ports}")
-        context=dict(
-        value=value,
-        device_id=value_dict['CihazId'],
-        device_name=value_dict['CihazAdi'],
-        device_port=value_dict['CihazPort'],
-        device_ip=value_dict['CihazIp'],
-        server_ip=value_dict['ServerIp'],
-        device_ssid=value_dict['CihazSSID'],
-        device_password=value_dict['CihazPassword'],
-        ag_gecidi=value_dict['AgGecidi'],
-        myports=myports,
-        port_listesi=port_listesi,
-    )
+        try:
+            value_dict=json.loads(value)
+
+            context=dict(
+            value=value,
+            device_id=value_dict['CihazId'],
+            device_name=value_dict['CihazAdi'],
+            device_port=value_dict['CihazPort'],
+            device_ip=value_dict['CihazIp'],
+            server_ip=value_dict['ServerIp'],
+            device_ssid=value_dict['CihazSSID'],
+            device_password=value_dict['CihazPassword'],
+            ag_gecidi=value_dict['AgGecidi'],
+            myports=myports,
+            port_listesi=port_listesi,
+        )
+        except:
+            context=dict(
+            value="USB Portu kontrol ediniz",
+            device_id="USB Portu kontrol ediniz",
+            device_name="USB Portu kontrol ediniz",
+            device_port="USB Portu kontrol ediniz",
+            device_ip="USB Portu kontrol ediniz",
+            server_ip="USB Portu kontrol ediniz",
+            device_ssid="USB Portu kontrol ediniz",
+            device_password="USB Portu kontrol ediniz",
+            ag_gecidi="USB Portu kontrol ediniz",
+            myports=myports,
+            port_listesi=port_listesi,
+        )
+
     elif config_parameter == "id":
         value  = write_read_id(id) #241117
         print(f"arduino value: {value}, type: {type(value)}")
@@ -817,3 +834,61 @@ def write_read_reset():
     print(f"arduino.readline():{data}")
     return  data  
 
+# def additional_text(request,id,additional_text):
+def additional_text(request):
+    additional_text=request.GET.get('additional_text')
+    print(f"additional text 1: {additional_text}")
+    temp_id=int(request.GET.get('temp_id'))
+    temp_user=request.GET.get('temp_user')
+    template_name=request.GET.get('temp_template')
+    device_name=request.GET.get('device_name')
+    device_port=request.GET.get('device_port')
+    tarih=timezone.now()
+    tarih2=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tarih3=datetime.timestamp(tarih)
+    print(f"tarih1:{tarih},tarih2:{tarih2}")
+    edited_item=Temperature.objects.get(id=temp_id)
+    edited_item.additionalText=f"{additional_text},ID:{temp_id}, Kullanıcı:{temp_user}, Tarih:{tarih2}"
+    print(f"edited_item.additionalText: {edited_item.additionalText}")
+    edited_item.save()
+
+    if template_name=="device.html":
+        return redirect(f"/app_monitor/cihazlar/{device_name}/port={device_port}")
+    else:
+        return redirect('/app_monitor')
+
+def additional_text_sil(request,id):
+    print(f"additonal_text_sil girdi.")
+    edited_item=Temperature.objects.get(id=int(id))
+    edited_item.additionalText=""
+    edited_item.save()
+    print(f"edited_item:{edited_item}")
+
+    return redirect('/app_monitor')
+
+def additional_text_singledevice(request):
+    additional_text=request.GET.get('additional_text')
+    print(f"additional text 1: {additional_text}")
+    temp_id=int(request.GET.get('temp_id'))
+    temp_user=request.GET.get('temp_user')
+    device_name=request.GET.get('device_name')
+    device_port=request.GET.get('device_port')
+    tarih=timezone.now()
+    tarih2=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tarih3=datetime.timestamp(tarih)
+    print(f"tarih1:{tarih},tarih2:{tarih2}")
+    edited_item=Temperature.objects.get(id=temp_id)
+    edited_item.additionalText=f"{additional_text},ID:{temp_id}, Kullanıcı:{temp_user}, Tarih:{tarih2}"
+    print(f"edited_item.additionalText: {edited_item.additionalText}")
+    edited_item.save()
+
+    return redirect(f"/app_monitor/{device_name}/{device_port}")
+
+def additional_text_sil_singledevice(request,id):
+    print(f"additonal_text_sil girdi.")
+    edited_item=Temperature.objects.get(id=int(id))
+    edited_item.additionalText=""
+    edited_item.save()
+    print(f"edited_item:{edited_item}")
+
+    return redirect('/app_monitor')

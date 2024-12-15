@@ -21,7 +21,21 @@ const timer=() => {
 <div class="container">
 
   <h3 class="bg-primary text-center">TÜM CİHAZLAR</h3> 
-  <h3 ><a href="arduino_serial_local-all" target="_blank">SERI PORT CONFIG</a> </h3> 
+  <div class="row">
+    <div class="col-sm-12 d-flex justify-content-end">
+       
+       {% if request.user.is_authenticated %}
+       <span class="me-3">Kullanıcı: {{request.user.username}}</span>
+       <a href="{% url "app_user_profile:logout_view" %} ">Logout</a>
+       {% else %}              
+      <a href="{% url "app_user_profile:login_view" %} ">Login</a>
+      <a class="ms-3" href=" {% url 'app_user_profile:register_view' %} ">Register</a>
+      {% endif %}
+      <br>
+      
+    </div>
+  </div>
+  
 {% comment %} {% csrf_token %} {% endcomment %}
 {% comment %} <button class="btn btn-danger">BOOTSTRAP...</button> {% endcomment %}
 
@@ -68,8 +82,12 @@ const timer=() => {
             </table>
             </div>
             <div class="row">
-              <div class="col-sm-12">
+              <div class="col-sm-6">
                <a href="/app_monitor/export_to_excel_all"> <button class="btn btn-success">EXCEL</button> </a> 
+              </div>
+              <div class="col-sm-6 text-end">
+                <h6 ><a href="arduino_serial_local-all" target="_blank">CİHAZ CONFIG</a> </h6>
+                <h6 ><a href="/app_monitor/cihazlar_tum" target="_blank">TÜM CİHAZLAR</a>  </h6>
               </div>
             </div>
             <div class="row">
