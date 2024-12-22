@@ -28,7 +28,7 @@ def device_filter_id(request):
         filter_result_id=Temperature.objects.filter(
             id__gte=1,id__lte=Temperature.objects.last().id
             ).filter(device_name=cihazadi.capitalize()).order_by('-id')
-        print(f"(id1=='' or None) and (id2=="" or None)")
+        print(f"(id1=='' or None) and (id2==' or None) sayısı:{filter_result_id.count()}")
     elif id1=="" or None: 
         filter_result_id=Temperature.objects.filter(
             id__gte=1,id__lte=id2
@@ -51,38 +51,40 @@ def device_filter_id(request):
     if (sicaklik1=="" or None) and (sicaklik2=="" or None): 
             filter_result_temp=filter_result_id.filter(
             # temperature__gte=0,temperature__lte=sicaklik2
-            temperature__gte=0,temperature__lte=100
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')  
+            Q(temperature__gte=0,temperature__lte=100)|
+            Q(temperature__exact=None)
+            ).filter(device_name__iexact=cihazadi).order_by('-id')  
             print(f"sicaklik kontrolu: sicaklik1=='' or None and sicaklik2=='' or None")  
             print(f"temp sayısı none-none: {filter_result_temp.count()}")   
     elif sicaklik1=="" or None: #SICAKLIK aralığı
             filter_result_temp=filter_result_id.filter(
             # temperature__gte=0,temperature__lte=sicaklik2
             temperature__gte=0,temperature__lte=sicaklik2
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')       
+            ).filter(device_name__iexact=cihazadi).order_by('-id')       
     elif sicaklik2=="" or None:
         filter_result_temp=filter_result_id.filter(
                 temperature__gte=sicaklik1
-                ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+                ).filter(device_name__iexact=cihazadi).order_by('-id')
     else:
             filter_result_temp=filter_result_id.filter(
             temperature__gte=sicaklik1,temperature__lte=sicaklik2
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     #NEM aralığı
     if (nem1=="" or None) and (nem2=="" or None): 
         filter_result_nem=filter_result_temp.filter(
-            humidity__gte=0,humidity__lte=100
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            Q(humidity__gte=0,humidity__lte=100)|
+            Q(humidity__exact=None)
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
         print(f"nem kontrolu:nem1=="" or None) and (nem2=="" or None ")
         print(f"nem sayısı none-none: {filter_result_nem.count()}") 
     elif nem1=="" or None: 
         filter_result_nem=filter_result_temp.filter(
             humidity__gte=0,humidity__lte=nem2
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     elif nem2=="" or None:
         filter_result_nem=filter_result_temp.filter(
             humidity__gte=nem1
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     else:
         filter_result_nem=filter_result_temp.filter(
                 humidity__gte=nem1,humidity__lte=nem2
@@ -93,21 +95,21 @@ def device_filter_id(request):
     if (voltaj1=="" or None) and (voltaj2=="" or None): 
         filter_result_voltaj=filter_result_nem.filter(
             volcum__gte=0,volcum__lte=20
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
         print(f"voltaj kontrolu:voltaj1=="" or None) and (voltaj2=="" or None ")
         print(f"voltaj sayısı none-none: {filter_result_voltaj.count()}") 
     elif voltaj1=="" or None: 
         filter_result_voltaj=filter_result_nem.filter(
             volcum__gte=0,volcum__lte=voltaj2
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     elif voltaj2=="" or None:
         filter_result_voltaj=filter_result_nem.filter(
             volcum__gte=voltaj1
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     else:
         filter_result_voltaj=filter_result_nem.filter(
                 volcum__gte=voltaj1,volcum__lte=voltaj2
-                ).filter(device_name=cihazadi.capitalize()).order_by('-id')    
+                ).filter(device_name__iexact=cihazadi).order_by('-id')    
         print(f"voltaj sayısı: {filter_result_voltaj.count()}")
         print(f"nem sayısı: {filter_result_nem.count()}")
 
@@ -115,30 +117,31 @@ def device_filter_id(request):
     print(f"tarih1 tipi: {type(tarih1)}")
     print(f"tarih1: {tarih1}")
     #2024-11-12 22:40:06.395707   '%Y-'
-    tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
-    tarih1=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
-    tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
-    tarih2=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
-    # tarih1_datetime=datetime.date(tarih1)
-    # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
+    if (tarih1!="" or None) and (tarih2!="" or None): 
+        tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih1=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih2=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        # tarih1_datetime=datetime.date(tarih1)
+        # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
     if (tarih1=="" or None) and (tarih2=="" or None): 
         filter_result_tarih=filter_result_voltaj.filter(
             date__gte=datetime(2023,12,30),date__lte=datetime.now()
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
         print(f"tarih kontrolu:tarih1=="" or None) and (tarih2=="" or None ")
         print(f"tarih sayısı none-none: {filter_result_tarih.count()}") 
     elif tarih1=="" or None: 
         filter_result_tarih=filter_result_voltaj.filter(
             date__lte=tarih2
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     elif tarih2=="" or None:
         filter_result_tarih=filter_result_voltaj.filter(
             date__gte=tarih1
-            ).filter(device_name=cihazadi.capitalize()).order_by('-id')
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
     else:
         filter_result_tarih=filter_result_voltaj.filter(
                 date__gte=tarih1,date__lte=tarih2
-                ).filter(device_name=cihazadi.capitalize()).order_by('-id')    
+                ).filter(device_name__iexact=cihazadi).order_by('-id')    
         print(f"tarih sayısı: {filter_result_tarih.count()}")
         print(f"voltaj sayısı: {filter_result_voltaj.count()}")
     
@@ -147,8 +150,8 @@ def device_filter_id(request):
     # print(f"filter_result= {filter_result_nem}")
     # print(f"kayıt sayısı filter_result= {kayit_sayisi_filter}")
 
-    paginator = Paginator(filter_result_voltaj, 5)  # Show 5 contacts per page.
-    device_search_count = filter_result_voltaj.count()
+    paginator = Paginator(filter_result_tarih, 5)  # Show 5 contacts per page.
+    device_search_count = filter_result_tarih.count()
     page_number = request.GET.get('page')
     devicePaginator = paginator.get_page(page_number)
     print(f"devicePaginator: {devicePaginator}")
@@ -168,7 +171,8 @@ def device_filter_id(request):
         devicePaginator=devicePaginator,
         kayit_sayisi_filter=kayit_sayisi_filter,
         kayit_araligi=kayit_araligi,
-        device500=filter_result_temp,
+        # device500=filter_result_temp,
+        device500=filter_result_tarih,
         graph_adi="ID",
     )
     # return HttpResponse(filter_result)
