@@ -1,4 +1,14 @@
 
+<div class="row d-flex ">
+  <div class="col-sm-12">
+  <button class="btn btn-secondary btn-sm my-1 ms-3">TOPLAM SAYI: {{events_total}} </button>
+  <button class="btn btn-danger btn-sm my-1">KESINTI: {{events_alarm1}} </button>
+  <button class="btn btn-info btn-sm">CIKIS ALARM: {{events_alarm2}} </button>
+  <button class="btn btn-success btn-sm">CLEAR: {{events_clear}} </button>
+  <button></button>
+  <button></button>
+</div>
+</div>
 <table class="table table-hover" data-click-to-select="true">
     <thead>
        <tr class="bg-primary px-5">
@@ -16,7 +26,14 @@
    <tbody>
     {% for event in events %}
      {% comment %} <tr class="{% if event.event_active==True %}bg-danger{% else %}bg-success{% endif %}"> {% endcomment %}
-     <tr  {% if event.event_active %}class="bg-danger ps-5"{% else %}class="bg-success"{% endif %} style="margin:20%" >
+
+     <tr  
+     {% comment %} {% if event.event_active and event.alarm_id is 1 %}class="bg-danger ps-5"{% else %}class="bg-success"{% endif %}  {% endcomment %}
+     {% if event.event_active and event.alarm_id is 1 %}class="bg-danger ps-5"{% endif %} 
+     {% if event.event_active and event.alarm_id is 2 %}class="bg-info ps-5"{% endif %} 
+     {% if not event.event_active  %}class="bg-success ps-5"{% endif %} 
+     
+     style="margin:20%" >
        <td class="ps-5" >{{event.id}}</td>
        <td >{{event.device_name}}</td>
        <td >{{event.device_id}}</td>

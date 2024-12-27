@@ -25,12 +25,12 @@ class Temperature(models.Model):
     # device_id=models.IntegerField(blank=True,null=True)
     device_id=models.ForeignKey(Device,on_delete=models.CASCADE,null=True, blank=True)
     device_name=models.CharField(blank=True,null=True, max_length=50)
-    # cikis1=models.CharField(blank=True,null=True, max_length=5)
-    # cikis2=models.CharField(blank=True,null=True, max_length=5)
+    cikis1=models.CharField(blank=True,null=True, max_length=5)
+    cikis2=models.CharField(blank=True,null=True, max_length=5)
     # device_name=models.ForeignKey(Device,on_delete=models.CASCADE,null=True, blank=True)
 
     def __str__(self):
-        return (f"ID:{self.id},Sıcaklık: {self.temperature}, Nem: {self.humidity}, Voltaj: {self.volcum}, Tarih: {self.date}")
+        return (f"ID:{self.id},Cihaz ID: {self.device_id.device_id} ,Sıcaklık: {self.temperature}, Nem: {self.humidity}, Voltaj: {self.volcum}, Tarih: {self.date}, Cikis1:{self.cikis1}")
     
 
 class Alarm(models.Model):
@@ -55,5 +55,5 @@ class Event(models.Model):
     info=models.CharField(blank=True,null=True, max_length=50)
 
     def __str__(self):
-        return f"{self.device_name}--{self.alarm_name}--{self.start_time}"
+        return f"Device name:{self.device_name}--Device ID:{self.device_name}--{self.alarm_name}--{self.start_time}"
 

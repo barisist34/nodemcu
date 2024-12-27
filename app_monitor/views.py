@@ -89,6 +89,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         humidity = request.GET.get("humidity")
         volcum = request.GET.get("volcum") #voltaj degeri
         device_name=request.GET.get("device_name")
+        cikis1=request.GET.get("cikis1")
         print(f"Entry.DoesNotExist......??: {Device.objects.filter(device_id=3)}")
         # if not Device.objects.filter(device_name__icontains=device_name).exists():
         if not Device.objects.filter(device_name__iexact=device_name).exists():
@@ -124,7 +125,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         
         print(f"kayit: {kayit} - device_name: {device_name}")
 
-        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now()) #241013
+        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now(),cikis1=cikis1) #241013
         newRecord.save()
         # newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name, date=timezone.now())
     else:
@@ -1099,7 +1100,7 @@ def scheduler_cihaz(request):
                     new_event.save()
                     print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
 
-    events=Event.objects.all()
+    events=Event.objects.all()[::-1]
     
     device_state_now=False
     #EVENT clear yapma:
@@ -1134,10 +1135,20 @@ def scheduler_cihaz(request):
 
 def event_list_view(request):
     events=Event.objects.all()[::-1]
+    events_total=Event.objects.filter(event_active=True).count()
+    events_alarm1=Event.objects.filter(alarm_id=1).filter(event_active=True).count()
+    events_alarm2=Event.objects.filter(alarm_id=2).filter(event_active=True).count()
+    events_clear=Event.objects.filter(event_active=False).count()
+
     # datetime_now=datetime.now()
     datetime_now=timezone.now()
     context=dict(
         events=events,
+        events_total=events_total,
+        events_alarm1=events_alarm1,
+        events_alarm2=events_alarm2,
+        events_clear=events_clear,
+
         datetime_now=datetime_now,
     )
     print(f"event_list_view girdi, time:{datetime_now}")

@@ -23,33 +23,68 @@ def first_task_view():
 
     devices_all=Device.objects.all()
     for device in devices_all:
-        if device.event_set.last() is None:
+        if device.event_set.filter(alarm_id=1).last() is None:# CİHAZ KESİK Mİ?
             if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360):# and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
                 device.device_state=False
                 new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
                 new_event.save()
                 print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
-            # else:
-            #     if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360) and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
-            #         device.device_state=False
-            #         new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
-            #         new_event.save()
-            #         print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
-            
-        else:
+        else:# CİHAZ KESİK Mİ?
             if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360) and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
                 device.device_state=False
                 new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
                 new_event.save()
                 print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
+        if device.event_set.filter(alarm_id=2).last() is None: # CIKIŞ_1 KESİK Mİ?
+            # print(f"device.event_set.filter(alarm_id=2).last() is None: OK")
+            print(f"ILK KAYIT device.temperature_set.last().cikis1: {device.temperature_set.last().cikis1}")
+            print(f"ILK KAYIT device.temperature_set.last(): {device.temperature_set.last()}")
+            print(f"ILK KAYIT device.temperature_set.last().cikis1: {type(device.temperature_set.last().cikis1)}")
+            if (device.temperature_set.last().cikis1) == "LOW":# 
+                print(f"device.temperature_set.last().cikis1==LOW: OK")
+                new_event=Event(device_id=device,device_name=device.device_name,alarm_id=2,alarm_name="Çıkış-1 Down",start_time=datetime_now)
+                new_event.save()
+                print(f"Çıkış1 event:{device.event_set.last()}")
+        else:
+            print(f"KAYITLAR VAR device.temperature_set.last().cikis1: {device.temperature_set.last().cikis1}, length:{len(device.temperature_set.last().cikis1)} ")
+            strip_test=device.temperature_set.last().cikis1.strip('"')
+            print(f"STRIP KAYITLAR VAR device.temperature_set.last().cikis1: {strip_test}, length:{len(strip_test)} ")
+            print(f"KAYITLAR VAR device.temperature_set.last(): {device.temperature_set.last()}")
+            print(f"KAYITLAR VAR device.temperature_set.last().cikis1: {type(device.temperature_set.last().cikis1)}")   
+            print(f"if (device.temperature_set.last().cikis1 is LOW ? : ): {(device.temperature_set.last().cikis1 is 'LOW')}")         
+            print(f"STRIP if (device.temperature_set.last().cikis1 is LOW ? : ): {( strip_test == 'LOW')}")         
+            if (device.temperature_set.last().cikis1.strip('"') == "LOW") and (device.event_set.last().event_active==False):
+                print(f"Çıkış1 event:{device.event_set.last()}")
+                new_event=Event(device_id=device,device_name=device.device_name,alarm_id=2,alarm_name="Çıkış-1 Down",start_time=datetime_now)
+                new_event.save()
+                print(f"Çıkış1 event:{device.event_set.last()}")
 
-    events=Event.objects.all()
+    events_cihaz_kontrol=Event.objects.filter(alarm_id=1)
+    print(f"events_cihaz_kontrol: {events_cihaz_kontrol.count()}")
     # print(f"events: {events}")
     #EVENT clear yapma:
-    for event in events:
+    for event in events_cihaz_kontrol:
+        # print(f"events_cihaz_kontrol,alarm ID: {event.alarm_id}")
     # for device in devices_all:
         if datetime.timestamp(datetime_now) - datetime.timestamp(event.device_id.temperature_set.last().date) < 360: #gerçekte online ise
-            print("event clear bloğuna girdi...")
+            print(f"event clear bloğuna girdi...event.device_id:{event.device_id}, event.id:{event.id}")
+            device_state_now=True
+            if event.event_active == True: #event devam ediyorsa
+                event.event_active=False #event düzeldi yap
+                event.finish_time=datetime.now()
+                event.save()
+            else:
+                pass # event olarak devam etmiyorsa
+
+    events_cihaz_kontrol=Event.objects.filter(alarm_id=2)
+    print(f"events_cihaz_kontrol: {events_cihaz_kontrol.count()}")
+    # print(f"events: {events}")
+    #EVENT clear yapma:
+    for event in events_cihaz_kontrol:
+        # print(f"events_cihaz_kontrol,alarm ID: {event.alarm_id}")
+    # for device in devices_all:
+        if event.device_id.temperature_set.last().cikis1 == "HIGH": # cikis1 HIGH ise
+            print(f"cikis1 clear bloğuna girdi...event.device_id:{event.device_id}, event.id:{event.id}")
             device_state_now=True
             if event.event_active == True: #event devam ediyorsa
                 event.event_active=False #event düzeldi yap

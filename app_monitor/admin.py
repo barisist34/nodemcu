@@ -8,6 +8,7 @@ class TemperatureAdmin(admin.ModelAdmin):
         'temperature',
         'date',
         'mail',
+        'cikis1',
     ]
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
@@ -31,6 +32,8 @@ class EventAdmin(admin.ModelAdmin):
         'pk',
         'device_id',
         'device_name',
+        'alarm_id',
+        'alarm_name',
         'start_time',
         'finish_time',
         'info',
