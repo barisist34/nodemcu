@@ -22,23 +22,6 @@ const timer=() => {
 
   {% comment %} <h3 class="bg-primary text-center">TÜM CİHAZLAR</h3>  {% endcomment %}
   <h3 class="text-center">TÜM KAYITLAR</h3> 
-  {% comment %} <div class="row">
-    <div class="col-sm-12 d-flex justify-content-end">
-       
-       {% if request.user.is_authenticated %}
-       <span class="me-3">Kullanıcı: {{request.user.username}}</span>
-       <a href="{% url "app_user_profile:logout_view" %} ">Logout</a>
-       {% else %}              
-      <a href="{% url "app_user_profile:login_view" %} ">Login</a>
-      <a class="ms-3" href=" {% url 'app_user_profile:register_view' %} ">Register</a>
-      {% endif %}
-      <br>
-      
-    </div>
-  </div> {% endcomment %}
-  
-{% comment %} {% csrf_token %} {% endcomment %}
-{% comment %} <button class="btn btn-danger">BOOTSTRAP...</button> {% endcomment %}
 
         <div id="temperature_ajax">
             <br><br>
@@ -56,32 +39,96 @@ const timer=() => {
                </thead>
              <tbody>
             
-             {% for temp in tempsajax %}
-               <tr>
-                   {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
-                 <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
-                 <td style="background-color:#FF0000">{{temp.temperature}}</td>
-                <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
-                  <td style="background-color:#FF0000"> {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->        
-                       {% if temp.mailSend == False %}
-                       <td style="background-color:#FF0000"> {{temp.mailSend}}</td>
-                       {% else %}
-                       <td style="background-color:#0000FF"> {{temp.mailSend}}</td>
-                       {% endif %}
-                   
-                   {% else %}
-            
-                 <th scope="row" >{{temp.id}}</th>
-                 <td> {{temp.device_name}}</td>
-                 <td >{{temp.temperature}}</td>
-                <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
-                  <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->            
-                   {% endif %}               
-               </tr>              
-             {% endfor %}            
+             {% comment %} {% for temp in tempsajax %} {% endcomment %}
+             {% for temp in devicePaginator %}
+             <tr>
+                 {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
+               <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
+               <td style="background-color:#FF0000">{{temp.temperature}}</td>
+              <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+                <td style="background-color:#FF0000"> {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->        
+                     {% if temp.mailSend == False %}
+                     <td style="background-color:#FF0000"> {{temp.mailSend}}</td>
+                     {% else %}
+                     <td style="background-color:#0000FF"> {{temp.mailSend}}</td>
+                     {% endif %}
+                 
+                 {% else %}
+          
+               <th scope="row" >{{temp.id}}</th>
+               <td> <a target="_blank" href="/app_monitor/cihazlar/{{temp.device_name}}/port={{temp.device_id.device_port}}" >{{temp.device_name}}</a> </td>
+               <td> <a target="_blank" href="/app_monitor/cihazlar/{{temp.device_id}}" >{{temp.device_id}}</a> </td>
+               {% comment %} <td> {{temp.device_id}}</td> {% endcomment %}
+               <td >{{temp.temperature}}</td>
+               <td >{{temp.humidity}}</td>
+               <td >{{temp.volcum}}</td>
+               <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
+               <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+               <td >
+                {% comment %} <button type="button" data-bs-toggle="modal" data-bs-target="#modal1" data-bs-toggle="modal">...</button> {% endcomment %}
+                <button type="button" data-bs-toggle="modal" data-bs-target="#modal{{temp.id}}" data-bs-toggle="modal">...</button>
+                <span class="d-inline-block text-truncate" style="max-width: 150px;" >{{temp.additionalText}}</span>
+                {% comment %} <div class="modal" id="modal1" data-bs-backdrop="static"> {% endcomment %}
+                <div class="modal" id="modal{{temp.id}}" data-bs-backdrop="static">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title">ID:{{temp.id}},Cihaz Adı:{{temp.device_name}}  </h4>
+                        {% comment %} <button class="close">kapat</button> {% endcomment %}
+                        <button type="button" class="close" data-bs-dismiss="modal">&times;</button> <!-- data-dismiss değil data-bs-dismiss OLMALI -->  
+                      </div>
+                      <form action="/app_monitor/additional_text">
+                      <div class="modal-body">
+                          <div class="mb-3">
+                            <label for="acknowledge">Açıklama</label>
+                            <textarea class="form-control" name="additional_text" id="additional_text" rows="5" >{{temp.additionalText}}</textarea>
+                            {% comment %} <label id="modal_id" for="" name="{{modal_id}}" hidden>{{temp.id}} </label> {% endcomment %}
+                            <input hidden type="text" name="temp_id" value="{{temp.id}} ">
+                            <input hidden type="text" name="temp_user" value="{{request.user.username}} ">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          {% comment %} <button  class="btn btn-secondary" data-bs-dismiss="modal">Sil</button> {% endcomment %}
+                          <a class="btn btn-secondary" href="/app_monitor/additional_text_sil/{{temp.id}}" > Sil</a>
+                          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="modal_kaydet">Kaydet </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </td>
+               <!-- Scrollable modal -->
+          
+               {% endif %}
+             
+             </tr>  
+          
+           {% endfor %}
              </tbody>
             </table>
             </div>
+{% comment %} 
+<!--  PAGINATOR  -->
+<div class="row">
+  <div class="pagination col-sm-4 offset-sm-1 ">
+    <span class="step-links">
+          {% if devicePaginator.has_previous %}
+          <a href="?page=1">&laquo; first</a>
+          <a href="?page={{ devicePaginator.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
+          
+          {% endif %}
+          
+          <span class="current">
+              Page {{ devicePaginator.number }} of {{ devicePaginator.paginator.num_pages }}.
+          </span>
+    
+          {% if devicePaginator.has_next %}
+          <a href="?page={{ devicePaginator.next_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
+              <a href="?page={{ devicePaginator.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+      </div> <!-- paginator col  --> {% endcomment %}
+
             <div class="row">
               <div class="col-sm-6">
                <a href="/app_monitor/export_to_excel_all"> <button class="btn btn-success">EXCEL</button> </a> 

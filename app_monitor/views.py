@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse,redirect
-from .models import Temperature,Device
+from .models import Temperature,Device,Alarm,Event
 from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -29,8 +29,18 @@ def dashboard(request):
     print("dashboard girdi....")
     # device_query=Device.objects.all().order_by('device_name')
     device_query=Device.objects.all().order_by(Lower('device_name'))
+    deviceAll = Temperature.objects.order_by('-id')
+    paginator = Paginator(deviceAll, 10)  # Show 5 contacts per page.
+
+    device_search_count = deviceAll.count()
+
+    page_number = request.GET.get('page')
+
+    devicePaginator = paginator.get_page(page_number)
+    # device_query = paginator.get_page(page_number)
     context=dict(
         device_query=device_query,
+        devicePaginator=devicePaginator,
     )
     return render(request,"app_monitor/dashboard.html",context)
 
@@ -38,10 +48,20 @@ def dashboard(request):
 # @requires_csrf_token
 def tempList(request):
     tempsajax = Temperature.objects.order_by('-id')[:10]
+    deviceAll = Temperature.objects.order_by('-id')
     kayit_sayisi_total_ajax = Temperature.objects.count()
     print("Templist girdi....")
+    paginator = Paginator(deviceAll, 10)  # Show 10 contacts per page.
+
+    device_search_count = deviceAll.count()
+
+    page_number = request.GET.get('page')
+
+    devicePaginator = paginator.get_page(page_number)
+    tempsajax = paginator.get_page(page_number)
     context=dict(
         tempsajax=tempsajax,
+        devicePaginator=devicePaginator,
         kayit_sayisi_total_ajax=kayit_sayisi_total_ajax,
     )
     return render(request, 'app_monitor/temperature_ajax.html', context)
@@ -1053,3 +1073,98 @@ def additional_text_sil_singledevice(request,id):
     print(f"edited_item:{edited_item}")
 
     return redirect('/app_monitor')
+
+def cron_task(request):
+
+    print(f"cron task çalıştı: {timezone.now()}")
+
+def scheduler_cihaz(request):
+    #event create yapılmalı,daha önce cihazın ilgili durumuyla ilgili event yoksa
+    #aşağıda aktif eventler düzelip düzelmedikleri kontrol edilmelidir.
+    #EVENT oluşturma:    
+    datetime_now=datetime.now()
+
+    devices_all=Device.objects.all()
+    for device in devices_all:
+        if device.event_set.last() is None:
+            if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360):# and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
+                device.device_state=False
+                new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
+                new_event.save()
+                print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
+            else:
+                if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360) and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
+                    device.device_state=False
+                    new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
+                    new_event.save()
+                    print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
+
+    events=Event.objects.all()
+    
+    device_state_now=False
+    #EVENT clear yapma:
+    for event in events:
+    # for device in devices_all:
+        if datetime.timestamp(datetime_now) - datetime.timestamp(event.device_id.temperature_set.last().date) < 360: #gerçekte online ise
+            device_state_now=True
+            if event.event_active == True: #event devam ediyorsa
+                event.event_active=False #event düzeldi yap
+                event.finish_time=datetime.now()
+            else:
+                pass # event olarak devam etmiyorsa
+        else:
+            if event.event_active == True: #event devam ediyorsa
+                pass 
+            else:
+                event.event_active=True #event düzeldi yap
+                event.finish_time=datetime.now()
+
+    #device_update yapılmalı.
+    #event kayıtları kontrol edilmeli
+    # for event in events:
+    #     if event.device_state != 
+
+    for device in devices_all:
+        pass
+    context=dict(
+        events=events,
+        datetime_now=datetime_now,
+    )
+    return render(request,"app_monitor/events.html",context)
+
+def event_list_view(request):
+    events=Event.objects.all()[::-1]
+    # datetime_now=datetime.now()
+    datetime_now=timezone.now()
+    context=dict(
+        events=events,
+        datetime_now=datetime_now,
+    )
+    print(f"event_list_view girdi, time:{datetime_now}")
+    return render(request,"app_monitor/events_ajax.html",context)
+
+#Excel export ALL
+def export_to_excel_event_all(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="events_all.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "ALL EVENTS"
+
+    # Add headers
+    headers = ["id","DEVICE NAME","DEVICE ID","ALARM ID","ALARM NAME", "EVENT ACTIVE", "START TIME","FINISH TIME","INFO"]
+    ws.append(headers)
+
+    events = Event.objects.all()[::-1] 
+        # temp = Temperature.objects.filter(device_name=cihazadi)
+    for event in events:
+        try:
+            ws.append([event.id,event.device_name,event.device_id.device_id,event.alarm_id,event.alarm_name, event.event_active, event.start_time,event.finish_time,event.info])
+            # ws.append([temps.id,temps.device_name,temps.temperature, temps.humidity, temps.volcum])
+        except AttributeError:
+            print("AttributeError oluştu...")
+
+    # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response

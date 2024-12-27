@@ -1,0 +1,84 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+<title>Olaylar</title>
+{% endblock title %}
+
+{% block content %}
+
+<script>
+    function fetchdata_perf() {
+        $.ajax({
+          url: 'event_list_view',
+          type: 'GET',
+          data: {
+          },
+          success: function (response) {
+            $('.event_container').html(response);
+            console.log(response);
+          },
+          failure: function () {
+            alert("ajax reverse fail geldi");
+          }
+        });
+      }
+      //$(document).ready(fetchdata_perf()) // sayfa manuel refresh yapıldığında 60 saniye beklemeden ilk kayıdı yapabilmek için. 
+      //Birden fazla pencerede dashboard açılırsa otomatik 1den fazla kayıt yapılmış olur,hatalı işleme denk gelir.
+      $(document).ready(function () {
+        setInterval(fetchdata_perf, 10000);
+      });
+</script>
+
+<div class="container-fluid p-0">
+<div class="event_container">
+<table class="table">
+    <thead>
+       <tr class="p-3">
+         <th class="" scope="col">id</th>
+         <th scope="col">Cihaz Adı</th>
+         <th scope="col">Cihaz ID</th>
+         <th scope="col">Alarm ID</th>
+         <th scope="col">Alarm Name</th>
+         <th scope="col">Event Active</th>
+         <th scope="col">Start Time</th>
+         <th scope="col">Finish Time</th>
+         <th class="" scope="col">Info</th>
+       </tr>
+     </thead>
+   <tbody>
+    {% for event in events %}
+     <tr>
+       <td >{{event.id}}</td>
+       <td >{{event.device_name}}</td>
+       <td >{{event.device_id}}</td>
+       <td >{{event.alarm_id}}</td>
+       <td >{{event.alarm_name}}</td>
+       <td > {{event.event_active}}</td> <!--  -->  
+       <td >{{event.start_time}}</td>
+       <td >{{event.finish_time}}</td>
+       <td >{{event.info}}</td>
+
+     </tr>  
+     {% endfor %}
+   </tbody>
+  </table>
+  {% comment %} {{datetime_now}} {% endcomment %}
+</div><!-- event container sonu -->  
+</div><!-- container sonu -->  
+<br>
+
+<div class="row">
+    <div class="col-sm-6">
+     <a href="/app_monitor/export_to_excel_event_all"> <button class="btn btn-success">EXCEL</button> </a> 
+    </div>
+    <div class="col-sm-6 text-end">
+      <h6 ><a href="arduino_serial_local-all" target="_blank">CİHAZ CONFIG</a> </h6>
+      <h6 ><a href="/app_monitor/cihazlar_tum" target="_blank">TÜM CİHAZLAR</a>  </h6>
+    </div>
+  </div>
+
+{% endblock content %}
+
+
+
+

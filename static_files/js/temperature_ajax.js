@@ -25,8 +25,8 @@ function fetchdata_perf() {
     }
   });
 }
-$(document).ready(fetchdata_perf()) // sayfa manuel refresh yapıldığında 60 saniye beklemeden ilk kayıdı yapabilmek için. 
+//$(document).ready(fetchdata_perf()) // sayfa manuel refresh yapıldığında 60 saniye beklemeden ilk kayıdı yapabilmek için. 
 //Birden fazla pencerede dashboard açılırsa otomatik 1den fazla kayıt yapılmış olur,hatalı işleme denk gelir.
 $(document).ready(function () {
-  setInterval(fetchdata_perf, 60000);
+  setInterval(fetchdata_perf, 10000);
 });

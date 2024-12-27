@@ -1,0 +1,34 @@
+
+<table class="table table-hover" data-click-to-select="true">
+    <thead>
+       <tr class="bg-primary px-5">
+         <th class="ps-5" scope="col">id</th>
+         <th scope="col">Cihaz Adı</th>
+         <th scope="col">Cihaz ID</th>
+         <th scope="col">Alarm ID</th>
+         <th scope="col">Alarm Name</th>
+         <th scope="col">Event Active</th>
+         <th scope="col">Start Time</th>
+         <th scope="col">Finish Time</th>
+         <th class="pe-5" scope="col">Info</th>
+       </tr>
+     </thead>
+   <tbody>
+    {% for event in events %}
+     {% comment %} <tr class="{% if event.event_active==True %}bg-danger{% else %}bg-success{% endif %}"> {% endcomment %}
+     <tr  {% if event.event_active %}class="bg-danger ps-5"{% else %}class="bg-success"{% endif %} style="margin:20%" >
+       <td class="ps-5" >{{event.id}}</td>
+       <td >{{event.device_name}}</td>
+       <td >{{event.device_id}}</td>
+       <td >{{event.alarm_id}}</td>
+       <td >{{event.alarm_name}}</td>
+       <td > {{event.event_active}}</td> <!--  -->  
+       <td >{{event.start_time}}</td>
+       <td >{{event.finish_time}}</td>
+       <td >{{event.info}}</td>
+
+     </tr>  
+     {% endfor %}
+   </tbody>
+  </table>
+  {{datetime_now}}

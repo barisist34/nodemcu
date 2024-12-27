@@ -2,7 +2,7 @@
 
 <b>Kayıt Sayısı : </b>{{kayit_sayisi_total_ajax}} <br>
 <b id="saat"> </b><br>
-   <table class="table">
+   <table class="table table-hover">
   <thead>
      <tr>
        <th scope="col">id</th>
@@ -17,7 +17,7 @@
    </thead>
  <tbody>
 
- {% for temp in tempsajax %}
+ {% for temp in devicePaginator %}
    <tr>
        {% if temp.temperature >= 45 %} <!--  if komutuyla sıcaklık 30 üstü olanlar kırmızı satır olacak --> 
      <th scope="row" style="background-color:#FF0000">{{temp.id}}</th>
@@ -84,8 +84,28 @@
 
  </tbody>
 </table>
-<br>
-
+{% comment %} <!--  PAGINATOR  -->
+<div class="row">
+  <div class="pagination col-sm-4 offset-sm-1 ">
+    <span class="step-links">
+          {% if devicePaginator.has_previous %}
+          <a href="?page=1">&laquo; first</a>
+          <a href="?page={{ devicePaginator.previous_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
+          
+          {% endif %}
+          
+          <span class="current">
+              Page {{ devicePaginator.number }} of {{ devicePaginator.paginator.num_pages }}.
+          </span>
+    
+          {% if devicePaginator.has_next %}
+          <a href="?page={{ devicePaginator.next_page_number }}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
+              <a href="?page={{ devicePaginator.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+      </div> <!-- paginator col  --> {% endcomment %}
+      
+      <br>
 <script>
   document.getElementById('modal_kaydet').addEventListener('click',function(){
     $.ajax({        

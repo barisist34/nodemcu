@@ -22,6 +22,7 @@ def device_filter_id(request):
     tarih1=request.GET.get("tarih1")
     tarih2=request.GET.get("tarih2")   
     cihazadi=request.GET.get("cihazadi")
+    print(f"device_filter_id request: {request}")
 
     #ID aralığı
     if (id1=="" or None) and (id2=="" or None):
@@ -176,7 +177,12 @@ def device_filter_id(request):
         graph_adi="ID",
     )
     # return HttpResponse(filter_result)
-    return render (request,"app_monitor/device.html",context)
+    if "anasayfa" in request.GET:
+         print(f"request anasayfa geldi dashboard yükleniyor")
+         return render (request,"app_monitor/dashboard.html",context)
+    else:
+         print(f"request anasayfa yok, device.html yükleniyor")
+         return render (request,"app_monitor/device.html",context)
 
 def device_filter_sicaklik(request):
     sicaklik1=request.GET.get("sicaklik1")

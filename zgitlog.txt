@@ -1,5 +1,13 @@
 
 
+241223-- OLAYLAR sayfası oluşturulacak.
+        Kesilen cihaz saati olacak.Rengi kırmızı olacak.
+        Cihaz düzelince rengi yeşil olacak,rengi yeşil olacak.
+        Alarm tablosu oluşturulacak.Alanlar(id,alarm_id,alarm_adı,cihaz_adı,cihaz_id,başlangıç saati,düzelme_saati,aciklama,)
+
+241223-- IPTAL---------(sağlıklı çalışmıyor)
+        devices.html de cihazadi hidden input etşketleri silindi,dashboard.html de cihazadi hidden etiket bırakıldı 1 adet.
+        device_filter_id view de request içinde cihazadi varsa return renderda dashboard.html yoksa device.html render yapılacak.
 
 240930-- cihaz sayfasında inputlar number ise rakamdan başka birşey html otomatik validasyonu nedeniyle girilemiyor.
         validation filter.py de fonksiyonlarda id1,sicaklik1 gibi değişkenlerin queryde kontrolü ile yapıldı.
