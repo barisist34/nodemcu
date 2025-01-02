@@ -80,8 +80,9 @@
     <th>İlk bağlantı</th>
     {% for devices in devices_all %}
     <tr class="device-row">
-        <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/port={{devices.device_port}}/devid={{devices.device_id}}">{{devices.device_name}}</a>  </td>
-        <td>{{devices.device_id}} </td>
+        {% comment %} <td><a target="_blank" href="/app_monitor/cihazlar/{{devices.device_name}}/port={{devices.device_port}}/devid={{devices.device_id}}">{{devices.device_name}}</a>  </td> {% endcomment %}
+        <td>{{devices.device_name}}</td>
+        <td> <a href="/app_monitor/cihazlar/{{devices.device_id}}" target="_blank">{{devices.device_id}}</a></td>
         <td>{{devices.device_port}} </td>
         <td>{{devices.device_ip}} </td>
         <td>{{devices.device_function}} </td>

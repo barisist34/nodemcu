@@ -1,14 +1,17 @@
 
-<div class="row d-flex ">
+{% comment %} <div class="row d-flex ">
   <div class="col-sm-12">
-  <button class="btn btn-secondary btn-sm my-1 ms-3">TOPLAM SAYI: {{events_total}} </button>
+  <button class="btn btn-secondary btn-sm my-1 ms-3"  data-bs-toggle="button">  <a href=""></a> TOPLAM SAYI: {{events_total}} </button>
   <button class="btn btn-danger btn-sm my-1">KESINTI: {{events_alarm1}} </button>
   <button class="btn btn-info btn-sm">CIKIS ALARM: {{events_alarm2}} </button>
   <button class="btn btn-success btn-sm">CLEAR: {{events_clear}} </button>
-  <button></button>
-  <button></button>
+  <input type="checkbox" class="btn-check" id="btn-check" autocomplete="off">
+  <label class="btn btn-primary" for="btn-check">TOPLAM SAYI: {{events_total}} </label>
 </div>
-</div>
+</div> {% endcomment %}
+<script>
+
+</script>
 <table class="table table-hover" data-click-to-select="true">
     <thead>
        <tr class="bg-primary px-5">
@@ -24,7 +27,8 @@
        </tr>
      </thead>
    <tbody>
-    {% for event in events %}
+    {% comment %} {% for event in events %} {% endcomment %}
+    {% for event in events_all %}
      {% comment %} <tr class="{% if event.event_active==True %}bg-danger{% else %}bg-success{% endif %}"> {% endcomment %}
 
      <tr  

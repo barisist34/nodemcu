@@ -16,6 +16,8 @@ import serial.tools.list_ports
 import time
 from django.contrib import messages #241115
 import json #241120
+from itertools import chain #241229 querysetleri birleştirmek için.
+from operator import attrgetter # 241229 sorted() fonksiyonu için 
 
 
 # from django.contrib
@@ -50,6 +52,14 @@ def tempList(request):
     tempsajax = Temperature.objects.order_by('-id')[:10]
     deviceAll = Temperature.objects.order_by('-id')
     kayit_sayisi_total_ajax = Temperature.objects.count()
+
+    cihaz_isimleri_query=Temperature.objects.values("device_name").distinct()
+    cihaz_isimleri=[]
+    print('Temperature.objects.values("device_name")')
+    print(cihaz_isimleri_query)
+    for cihaz in cihaz_isimleri_query:
+        cihaz_isimleri.append(list(cihaz.values())[0]) #cihaz isimlerini dizi olarak elde ettik.
+    print(f"cihaz isimleri dizi: {cihaz_isimleri}")
     print("Templist girdi....")
     paginator = Paginator(deviceAll, 10)  # Show 10 contacts per page.
 
@@ -554,6 +564,11 @@ def devices_all(request):
     devices_all=Device.objects.all()
     datetime_now=datetime.now()
     devices_online=[]
+    cihaz_isimleri_query=Temperature.objects.values("device_name").distinct()
+    cihaz_isimleri=[]
+    for cihaz in cihaz_isimleri_query:
+        cihaz_isimleri.append(list(cihaz.values())[0]) #cihaz isimlerini dizi olarak elde ettik. 250101
+
     print(f"devices_all:{devices_all}")
     # print(f"datetime.now(){datetime_now}")
     # print(f"timestamp now {datetime.timestamp(datetime_now)}")
@@ -567,6 +582,7 @@ def devices_all(request):
     context=dict(
         devices_all=devices_all,
         devices_online=devices_online,
+        cihaz_isimleri=cihaz_isimleri,
 
     )
     return render(request,"app_monitor/devices_all.html",context)
@@ -1080,75 +1096,89 @@ def cron_task(request):
     print(f"cron task çalıştı: {timezone.now()}")
 
 def scheduler_cihaz(request):
-    #event create yapılmalı,daha önce cihazın ilgili durumuyla ilgili event yoksa
-    #aşağıda aktif eventler düzelip düzelmedikleri kontrol edilmelidir.
-    #EVENT oluşturma:    
     datetime_now=datetime.now()
-
     devices_all=Device.objects.all()
-    for device in devices_all:
-        if device.event_set.last() is None:
-            if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360):# and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
-                device.device_state=False
-                new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
-                new_event.save()
-                print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
-            else:
-                if (datetime.timestamp(datetime_now) - datetime.timestamp(device.temperature_set.last().date) > 360) and (device.event_set.last().event_active==False): #saha kesikse ve event en son aktif değilse(saha çalışıyorsa),yeni event ekle.
-                    device.device_state=False
-                    new_event=Event(device_id=device,device_name=device.device_name,alarm_id=1,alarm_name="Cihaz Kesik",start_time=datetime_now)
-                    new_event.save()
-                    print(f"(device.event_set.last().event_active):{device.event_set.last().event_active}")
-
     events=Event.objects.all()[::-1]
-    
-    device_state_now=False
-    #EVENT clear yapma:
-    for event in events:
-    # for device in devices_all:
-        if datetime.timestamp(datetime_now) - datetime.timestamp(event.device_id.temperature_set.last().date) < 360: #gerçekte online ise
-            device_state_now=True
-            if event.event_active == True: #event devam ediyorsa
-                event.event_active=False #event düzeldi yap
-                event.finish_time=datetime.now()
-            else:
-                pass # event olarak devam etmiyorsa
-        else:
-            if event.event_active == True: #event devam ediyorsa
-                pass 
-            else:
-                event.event_active=True #event düzeldi yap
-                event.finish_time=datetime.now()
-
-    #device_update yapılmalı.
-    #event kayıtları kontrol edilmeli
-    # for event in events:
-    #     if event.device_state != 
 
     for device in devices_all:
         pass
+    
+    events=Event.objects.all()[::-1]
+    events_total_count=Event.objects.all().count()
+    events_alarm1_count=Event.objects.filter(alarm_id=1).filter(event_active=True).count()
+    events_alarm2_count=Event.objects.filter(alarm_id=2).filter(event_active=True).count()
+    events_clear_count=Event.objects.filter(event_active=False).count()
+
     context=dict(
         events=events,
+        events_total_count=events_total_count,
+        events_alarm1_count=events_alarm1_count,
+        events_alarm2_count=events_alarm2_count,
+        events_clear_count=events_clear_count,
         datetime_now=datetime_now,
     )
     return render(request,"app_monitor/events.html",context)
 
 def event_list_view(request):
     events=Event.objects.all()[::-1]
-    events_total=Event.objects.filter(event_active=True).count()
-    events_alarm1=Event.objects.filter(alarm_id=1).filter(event_active=True).count()
-    events_alarm2=Event.objects.filter(alarm_id=2).filter(event_active=True).count()
-    events_clear=Event.objects.filter(event_active=False).count()
+
+    events_total_state=request.GET.get("events_total_state")
+    events_alarm1_state=request.GET.get("events_alarm1_state")
+    events_alarm2_state=request.GET.get("events_alarm2_state")
+    events_alarm_clear_state=request.GET.get("events_alarm_clear_state")
+
+    print(f"events_alarm1_state:{events_alarm1_state},events_alarm2_state:{events_alarm2_state}, events_alarm_clear_state:{events_alarm_clear_state}")
+
+    if events_alarm1_state == "true":
+        # events_all=Event.objects.filter(alarm_id=1).filter(event_active=True)[::-1]
+        # events_1=Event.objects.filter(alarm_id=1)
+        events_all=[]
+    else:
+        # events_all=Event.objects.exclude(alarm_id=1).filter(event_active=True)[::-1]
+        events_all=Event.objects.filter(alarm_id=1).filter(event_active=True)[::-1]
+        # events_all=[]
+    if events_alarm2_state == "true":
+        # events_all=Event.objects.filter(alarm_id=2).filter(event_active=True)[::-1]
+        # events_2=Event.objects.filter(alarm_id=2).filter(event_active=True)
+        # events_all=sorted(chain(events_2,events_all),key=attrgetter('id'),reverse=True)
+        # events_all=list(chain(events_2,events_all),key=attrgetter('id'),reverse=True)
+        # events_2=list(chain(events_2,events_1))
+        # events_2=events_1+events_2
+        pass
+    else:
+        events_2=Event.objects.filter(alarm_id=2).filter(event_active=True)
+        events_all=sorted(chain(events_2,events_all),key=attrgetter('id'),reverse=True)
+        # events_all=events_all.exclude(alarm_id=2).filter(event_active=True)[::-1]
+        # events_all=Event.objects.all()[::-1]
+        
+    if events_alarm_clear_state == "true":
+    # if events_alarm_clear_state == True: # request ten gelen değerle kontrol yapıldığı için text olarak true değeri gelmekte.
+        # events_all=Event.objects.filter(event_active=False)[::-1]
+        # events_all=Event.objects.filter(event_active=False)[::-1]
+        # events_clear=Event.objects.filter(event_active=False)
+        # events_all=sorted(chain(events_clear,events_all),key=attrgetter('id'),reverse=True)
+        # events_all=events_clear+events_2
+        pass
+    else:
+        events_clear=Event.objects.filter(event_active=False)
+        events_all=sorted(chain(events_clear,events_all),key=attrgetter('id'),reverse=True)
+        # events_all=Event.objects.all()[::-1]
+        # events_all=events_all.exclude(event_active=True)[::-1]
+
+    # if (events_alarm1_state=="false") and (events_alarm2_state=="false") and (events_alarm_clear_state=="false"):
+    # # if (events_alarm1_state==False) and (events_alarm2_state==False) and (events_alarm_clear_state==False):
+    #     events_all=Event.objects.all()[::-1]
+
+    # if events_total_state == "true":
+    #     events_all=Event.objects.all()[::-1]
+    # else:
+    #     events_all=[]
 
     # datetime_now=datetime.now()
     datetime_now=timezone.now()
     context=dict(
         events=events,
-        events_total=events_total,
-        events_alarm1=events_alarm1,
-        events_alarm2=events_alarm2,
-        events_clear=events_clear,
-
+        events_all=events_all,
         datetime_now=datetime_now,
     )
     print(f"event_list_view girdi, time:{datetime_now}")
@@ -1179,3 +1209,10 @@ def export_to_excel_event_all(request):
     # Save the workbook to the HttpResponse
     wb.save(response)
     return response
+
+def event_buton_view(request):
+    all_events=request.GET.get("all_events")
+    critical_events=request.GET.get("critical_events")
+    info_events=request.GET.get("info_events")
+
+    # all_events_query=
