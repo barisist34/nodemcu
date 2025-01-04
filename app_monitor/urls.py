@@ -4,7 +4,8 @@ from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,te
 from app_monitor.views import django_device,django_device_backtest,deviceViewDetail,export_to_excel_all,devices_all
 from app_monitor.views import device_id,export_to_excel_id,arduino_serial_local,additional_text,additional_text_sil,export_to_excel_serial_query
 from app_monitor.views import cron_task,scheduler_cihaz,event_list_view,export_to_excel_event_all
-from app_monitor.filter import device_filter_id,device_filter_sicaklik,device_filter_nem,device_filter_voltaj,device_filter_tarih
+from app_monitor.filter import filter_device_name,filter_device_id
+# from app_monitor.filter import device_filter_id_id,device_filter_sicaklik,device_filter_nem,device_filter_voltaj,device_filter_tarih
 
 # app_name="app_monitor"
 
@@ -29,11 +30,13 @@ urlpatterns=[
     path('export_to_excel_all',export_to_excel_all,name="export_to_excel_all"),
     path('export_to_excel_id',export_to_excel_id,name="export_to_excel_id"),
     # path('device_filter',device_filter,name="device_filter"),
-    path('device_filter_id',device_filter_id,name="device_filter_id"),
-    path('device_filter_sicaklik',device_filter_sicaklik,name="device_filter_sicaklik"),
-    path('device_filter_nem',device_filter_nem,name="device_filter_nem"),
-    path('device_filter_voltaj',device_filter_voltaj,name="device_filter_voltaj"),
-    path('device_filter_tarih',device_filter_tarih,name="device_filter_tarih"),
+    path('filter_device_name',filter_device_name,name="filter_device_name"),
+    path('filter_device_id',filter_device_id,name="filter_device_id"),
+    # path('device_filter_id_id',device_filter_id_id,name="device_filter_id_id"),
+    # path('device_filter_sicaklik',device_filter_sicaklik,name="device_filter_sicaklik"),
+    # path('device_filter_nem',device_filter_nem,name="device_filter_nem"),
+    # path('device_filter_voltaj',device_filter_voltaj,name="device_filter_voltaj"),
+    # path('device_filter_tarih',device_filter_tarih,name="device_filter_tarih"),
     path('django_device',django_device,name="django_device"),
     path('django_device_backtest',django_device_backtest,name="django_device_backtest"),
     path('arduino_serial_local-<str:config_parameter>',arduino_serial_local,name="arduino_serial_local"),

@@ -229,8 +229,10 @@ def deviceViewDetail(request,str_device_name,port_no,device_id): # parametreleri
 
 def device_id(request,device_id): #241111
 # def deviceView(request,str_device_name): # parametrelerin sırası ÖNEMLİ
+
     device_id_query=Temperature.objects.filter(device_id=device_id).order_by('-id')
 
+    device500=Temperature.objects.filter(device_id__device_id=device_id).order_by('-id')[:500]
     paginator = Paginator(device_id_query, 5)  # Show 5 contacts per page.
 
     device_search_count = device_id_query.count()
@@ -244,6 +246,7 @@ def device_id(request,device_id): #241111
         devicePaginator=devicePaginator,
         device_search_count=device_search_count,
         device_id=str(device_id),
+        device500=device500,
         # device_port=device_port,
 
     )

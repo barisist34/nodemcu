@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block title %}
-<title > {{device_name}} EKRANI</title>
+<title > CIHAZ ADI : {{device_name}} KAYITLARI</title>
 {% endblock title %} 
 
 {% comment %} {% static  "js/temperature_ajax.js" %} {% endcomment %}
@@ -34,7 +34,7 @@
 <div class="row offset-sm- mt-3">
 
   <div class="col">
-    <form action="/app_monitor/device_filter_id" method="get"> <!--  id-sicaklıik tek buton form  -->
+    <form action="/app_monitor/filter_device_name" method="get"> <!--  id-sicaklıik tek buton form  -->
     <label class="col-sm-10" for="">ID</label><br>
     <input class="col-sm-10 mb-1" id="id-kucuk" name="id1" type="number" placeholder="İlk ID" pattern="[*-*-9-9]{4}" title="ID sayı olmalıdır">
     <input class="col-sm-10" id="id-buyuk" name="id2" type="number" placeholder="Son ID">
@@ -99,6 +99,7 @@
         <div class="col-sm-12">
           <div class="row">
             <div class="col-sm-6">
+            <b>{{device_name.capitalize}} KAYITLARI </b> <br>
             <b>Kayıtlar: {{kayit_araligi}} </b> / <b>Sıcaklık: {{sicaklik1}} -- {{sicaklik2}} </b>  
             /<b>Nem: {{nem1}} -- {{nem2}} </b>/<b>Voltaj: {{voltaj1}} -- {{voltaj2}} </b><br>
             <b>Tarih: {{tarih1}} -- {{tarih2}} </b>
