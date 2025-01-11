@@ -258,7 +258,7 @@ def exportExcel(request):
     
     return excel.make_response_from_a_table(Temperature, "xls", file_name="sheet")
 
-#Excel 
+#Excel (DEVICE_NAME değerine göre EXCEL çıktısı)
 def export_to_excel_serial_query(request):
     id1=request.GET.get("id1")
     id2=request.GET.get("id2")
@@ -366,35 +366,42 @@ def export_to_excel_serial_query(request):
         print(f"nem sayısı: {filter_result_nem.count()}")
 
     #TARIH aralığı
-    # print(f"tarih1 tipi: {type(tarih1)}")
-    # print(f"tarih1: {tarih1}")
-    # #2024-11-12 22:40:06.395707   '%Y-'
-    # if (tarih1!="" or "None") and (tarih2!="" or "None"): 
-    #     tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
-    #     tarih1=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
-    #     tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
-    #     tarih2=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
-    #     # tarih1_datetime=datetime.date(tarih1)
-    #     # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
-    # if (tarih1=="" or "None") and (tarih2=="" or "None"): 
-    #     filter_result_tarih=filter_result_voltaj.filter(
-    #         date__gte=datetime(2023,12,30),date__lte=datetime.now()
-    #         ).filter(device_name__iexact=cihazadi).order_by('-id')
-    #     print(f"tarih kontrolu:tarih1=="" or None) and (tarih2=="" or None ")
-    #     print(f"tarih sayısı none-none: {filter_result_tarih.count()}") 
-    # elif tarih1=="" or None: 
-    #     filter_result_tarih=filter_result_voltaj.filter(
-    #         date__lte=tarih2
-    #         ).filter(device_name__iexact=cihazadi).order_by('-id')
-    # elif tarih2=="" or None:
-    #     filter_result_tarih=filter_result_voltaj.filter(
-    #         date__gte=tarih1
-    #         ).filter(device_name__iexact=cihazadi).order_by('-id')
-    # else:
-    #     filter_result_tarih=filter_result_voltaj.filter(
-    #             date__gte=tarih1,date__lte=tarih2
-    #             ).filter(device_name__iexact=cihazadi).order_by('-id')    
-    #     print(f"tarih sayısı: {filter_result_tarih.count()}")
+    print(f"tarih1 tipi: {type(tarih1)}")
+    print(f"tarih1: {tarih1}")
+    #2024-11-12 22:40:06.395707   '%Y-'
+    tarih1_formatli=""
+    tarih2_formatli=""
+    if (tarih1!="" ): 
+        tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih1_formatli=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+    if (tarih2!=""):
+        tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih2_formatli=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        # tarih1_datetime=datetime.date(tarih1)
+        # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
+    if (tarih1=="" or None) and (tarih2=="" or None): 
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__gte=datetime(2023,12,30),date__lte=datetime.now() # EN AZ 1 YILLIK KAYIT
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
+        print(f"tarih kontrolu:tarih1=="" or None) and (tarih2=="" or None ")
+        print(f"tarih sayısı none-none: {filter_result_tarih.count()}") 
+    elif tarih1=="" or None: 
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__lte=tarih2_datetime
+            # date__lte=tarih2
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
+    elif tarih2=="" or None:
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__gte=tarih1_datetime
+            # date__gte=tarih1
+            ).filter(device_name__iexact=cihazadi).order_by('-id')
+    else:
+        filter_result_tarih=filter_result_voltaj.filter(
+                date__gte=tarih1_datetime,date__lte=tarih2_datetime
+                # date__gte=tarih1,date__lte=tarih2
+                ).filter(device_name__iexact=cihazadi).order_by('-id')    
+        print(f"tarih sayısı: {filter_result_tarih.count()}")
+        print(f"voltaj sayısı: {filter_result_voltaj.count()}")
 
     print(f"cihazadi export_to_excel= {cihazadi}")
     response = HttpResponse(content_type='application/ms-excel')
@@ -409,8 +416,180 @@ def export_to_excel_serial_query(request):
     ws.append(headers)
 
     # Add data from the model
-    temp=filter_result_voltaj
-    print(f"filter_result_voltaj:{filter_result_voltaj}")
+    temp=filter_result_tarih
+    # temp=filter_result_voltaj
+    print(f"filter_result_tarih:{filter_result_tarih}")
+    # print(f"filter_result_voltaj:{filter_result_voltaj}")
+    for temps in temp:
+        ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum,temps.date,temps.additionalText])
+
+    # Save the workbook to the HttpResponse
+    wb.save(response)
+    return response
+
+#Excel (DEVICE_ID değerine göre EXCEL çıktısı)
+def export_to_excel_serial_query_deviceid(request):
+    id1=request.GET.get("id1")
+    id2=request.GET.get("id2")
+    sicaklik1=request.GET.get("sicaklik1")
+    sicaklik2=request.GET.get("sicaklik2")
+    nem1=request.GET.get("nem1")
+    nem2=request.GET.get("nem2")
+    voltaj1=request.GET.get("voltaj1")
+    voltaj2=request.GET.get("voltaj2")
+    tarih1=request.GET.get("tarih1")
+    tarih2=request.GET.get("tarih2")   
+    cihazadi=request.GET.get("cihazadi")
+    cihazid=request.GET.get("cihazid")
+
+    print(f"get id1 to excel:{id1}")
+    print(f"get id2 to excel:{id2}")
+
+    #ID aralığı
+    if (id1=="" or None) and (id2=="" or None):
+        filter_result_id=Temperature.objects.filter(
+            id__gte=1,id__lte=Temperature.objects.last().id
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"(id1=='' or None) and (id2==' or None) sayısı:{filter_result_id.count()}")
+    elif id1=="" or None: 
+        filter_result_id=Temperature.objects.filter(
+            id__gte=1,id__lte=id2
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"id1=='' or None")
+    elif id2=="" or None:
+        filter_result_id=Temperature.objects.filter(
+            id__gte=id1
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"id2=='' or None")
+    
+    else:
+        filter_result_id=Temperature.objects.filter(
+                id__gte=id1,id__lte=id2
+                ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"id__gte=id1,id__lte=id2")
+        print(f"id sayısı: {filter_result_id.count()}")
+    
+    #SICAKLIK aralığı
+    if (sicaklik1=="" or None) and (sicaklik2=="" or None): 
+            filter_result_temp=filter_result_id.filter(
+            # temperature__gte=0,temperature__lte=sicaklik2
+            Q(temperature__gte=0,temperature__lte=100)|
+            Q(temperature__exact=None)
+            ).filter(device_id__device_id=cihazid).order_by('-id')  
+            print(f"sicaklik kontrolu: sicaklik1=='' or None and sicaklik2=='' or None")  
+            print(f"temp sayısı none-none: {filter_result_temp.count()}")   
+    elif sicaklik1=="" or None: #SICAKLIK aralığı
+            filter_result_temp=filter_result_id.filter(
+            # temperature__gte=0,temperature__lte=sicaklik2
+            temperature__gte=0,temperature__lte=sicaklik2
+            ).filter(device_id__device_id=cihazid).order_by('-id')       
+    elif sicaklik2=="" or None:
+        filter_result_temp=filter_result_id.filter(
+                temperature__gte=sicaklik1
+                ).filter(device_id__device_id=cihazid).order_by('-id')
+    else:
+            filter_result_temp=filter_result_id.filter(
+            temperature__gte=sicaklik1,temperature__lte=sicaklik2
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    #NEM aralığı
+    if (nem1=="" or None) and (nem2=="" or None): 
+        filter_result_nem=filter_result_temp.filter(
+            Q(humidity__gte=0,humidity__lte=100)|
+            Q(humidity__exact=None)
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"nem kontrolu:nem1=="" or None) and (nem2=="" or None ")
+        print(f"nem sayısı none-none: {filter_result_nem.count()}") 
+    elif nem1=="" or None: 
+        filter_result_nem=filter_result_temp.filter(
+            humidity__gte=0,humidity__lte=nem2
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    elif nem2=="" or None:
+        filter_result_nem=filter_result_temp.filter(
+            humidity__gte=nem1
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    else:
+        filter_result_nem=filter_result_temp.filter(
+                humidity__gte=nem1,humidity__lte=nem2
+                ).filter(device_id__device_id=cihazid).order_by('-id')  
+        print(f"nem kontrolu:humidity__gte=nem1,humidity__lte=nem2") 
+        print(f"nem sayısı nem1-nem2: {filter_result_nem.count()}")  
+    #VOLTAJ aralığı
+    if (voltaj1=="" or None) and (voltaj2=="" or None): 
+        filter_result_voltaj=filter_result_nem.filter(
+            volcum__gte=0,volcum__lte=20
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"voltaj kontrolu:voltaj1=="" or None) and (voltaj2=="" or None ")
+        print(f"voltaj sayısı none-none: {filter_result_voltaj.count()}") 
+    elif voltaj1=="" or None: 
+        filter_result_voltaj=filter_result_nem.filter(
+            volcum__gte=0,volcum__lte=voltaj2
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    elif voltaj2=="" or None:
+        filter_result_voltaj=filter_result_nem.filter(
+            volcum__gte=voltaj1
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    else:
+        filter_result_voltaj=filter_result_nem.filter(
+                volcum__gte=voltaj1,volcum__lte=voltaj2
+                ).filter(device_id__device_id=cihazid).order_by('-id')    
+        print(f"voltaj sayısı: {filter_result_voltaj.count()}")
+        print(f"nem sayısı: {filter_result_nem.count()}")
+
+    #TARIH aralığı
+    print(f"tarih1 tipi: {type(tarih1)}")
+    print(f"tarih1: {tarih1}")
+    #2024-11-12 22:40:06.395707   '%Y-'
+    tarih1_formatli=""
+    tarih2_formatli=""
+    if (tarih1!="" ): 
+        tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih1_formatli=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+    if (tarih2!=""):
+        tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
+        tarih2_formatli=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        # tarih1_datetime=datetime.date(tarih1)
+        # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
+    if (tarih1=="" or None) and (tarih2=="" or None): 
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__gte=datetime(2023,12,30),date__lte=datetime.now() # EN AZ 1 YILLIK KAYIT
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+        print(f"tarih kontrolu:tarih1=="" or None) and (tarih2=="" or None ")
+        print(f"tarih sayısı none-none: {filter_result_tarih.count()}") 
+    elif tarih1=="" or None: 
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__lte=tarih2_datetime
+            # date__lte=tarih2
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    elif tarih2=="" or None:
+        filter_result_tarih=filter_result_voltaj.filter(
+            date__gte=tarih1_datetime
+            # date__gte=tarih1
+            ).filter(device_id__device_id=cihazid).order_by('-id')
+    else:
+        filter_result_tarih=filter_result_voltaj.filter(
+                date__gte=tarih1_datetime,date__lte=tarih2_datetime
+                # date__gte=tarih1,date__lte=tarih2
+                ).filter(device_id__device_id=cihazid).order_by('-id')    
+        print(f"tarih sayısı: {filter_result_tarih.count()}")
+        print(f"voltaj sayısı: {filter_result_voltaj.count()}")
+
+    print(f"cihazid export_to_excel= {cihazid}")
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{cihazid}.xlsx"'
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = cihazid
+
+    # Add headers
+    headers = ["id","DEVICE NAME","DEVICE ID","DEVICE PORT","temperature", "humidity", "volcum","TARIH","ACIKLAMA"]
+    ws.append(headers)
+
+    # Add data from the model
+    temp=filter_result_tarih
+    # temp=filter_result_voltaj
+    print(f"filter_result_tarih:{filter_result_tarih}")
+    # print(f"filter_result_voltaj:{filter_result_voltaj}")
     for temps in temp:
         ws.append([temps.id,temps.device_name,temps.device_id.device_id,temps.device_id.device_port,temps.temperature, temps.humidity, temps.volcum,temps.date,temps.additionalText])
 
@@ -475,7 +654,7 @@ def export_to_excel_all(request):
     ws.append(headers)
 
 
-    temp = Temperature.objects.all() 
+    temp = Temperature.objects.all()[::-1]
         # temp = Temperature.objects.filter(device_name=cihazadi)
     for temps in temp:
         try:
@@ -615,36 +794,35 @@ def arduino_serial_local(request,config_parameter):
         myports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
         print(myports)
         print(f"all serial ports: {all_serial_ports}")
-        try:
-            value_dict=json.loads(value)
-
-            context=dict(
-            value=value,
-            device_id=value_dict['CihazId'],
-            device_name=value_dict['CihazAdi'],
-            device_port=value_dict['CihazPort'],
-            device_ip=value_dict['CihazIp'],
-            server_ip=value_dict['ServerIp'],
-            device_ssid=value_dict['CihazSSID'],
-            device_password=value_dict['CihazPassword'],
-            ag_gecidi=value_dict['AgGecidi'],
-            myports=myports,
-            port_listesi=port_listesi,
+        # try:
+        value_dict=json.loads(value)
+        context=dict(
+        value=value,
+        device_id=value_dict['CihazId'],
+        device_name=value_dict['CihazAdi'],
+        device_port=value_dict['CihazPort'],
+        device_ip=value_dict['CihazIp'],
+        server_ip=value_dict['ServerIp'],
+        device_ssid=value_dict['CihazSSID'],
+        device_password=value_dict['CihazPassword'],
+        ag_gecidi=value_dict['AgGecidi'],
+        myports=myports,
+        port_listesi=port_listesi,
         )
-        except:
-            context=dict(
-            value="USB Portu kontrol ediniz",
-            device_id="USB Portu kontrol ediniz",
-            device_name="USB Portu kontrol ediniz",
-            device_port="USB Portu kontrol ediniz",
-            device_ip="USB Portu kontrol ediniz",
-            server_ip="USB Portu kontrol ediniz",
-            device_ssid="USB Portu kontrol ediniz",
-            device_password="USB Portu kontrol ediniz",
-            ag_gecidi="USB Portu kontrol ediniz",
-            myports=myports,
-            port_listesi=port_listesi,
-        )
+        # except:
+        #     context=dict(
+        #     value="USB Portu kontrol ediniz",
+        #     device_id="USB Portu kontrol ediniz",
+        #     device_name="USB Portu kontrol ediniz",
+        #     device_port="USB Portu kontrol ediniz",
+        #     device_ip="USB Portu kontrol ediniz",
+        #     server_ip="USB Portu kontrol ediniz",
+        #     device_ssid="USB Portu kontrol ediniz",
+        #     device_password="USB Portu kontrol ediniz",
+        #     ag_gecidi="USB Portu kontrol ediniz",
+        #     myports=myports,
+        #     port_listesi=port_listesi,
+        # )
 
     elif config_parameter == "id":
         value  = write_read_id(id) #241117

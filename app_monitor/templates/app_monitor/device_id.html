@@ -231,8 +231,9 @@
   </div> <!-- paginator col  -->
   <div class="col-sm-6">
     {% comment %} <form action="/app_monitor/export_to_excel" method="get"> <!-- root adres "/" berlirtilmeli,relative adres olunca deviceView fonksiyonuna geri kaçıyor  --> {% endcomment %}
-    <form action="/app_monitor/export_to_excel_serial_query" method="get"> <!-- root adres "/" berlirtilmeli,relative adres olunca deviceView fonksiyonuna geri kaçıyor  -->
-    <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- hidden  -->
+    <form action="/app_monitor/export_to_excel_serial_query_deviceid" method="get"> <!-- root adres "/" berlirtilmeli,relative adres olunca deviceView fonksiyonuna geri kaçıyor  -->
+    <input hidden type="text" visibility:"hidden" display="none" name="cihazid" value="{{device_id}}"> <!-- hidden *** device_name yerine burada device_id gönderiliyor... -->
+    {% comment %} <input hidden type="text" visibility:"hidden" display="none" name="cihazadi" value="{{device_name}}"> <!-- hidden  --> {% endcomment %}
     <input hidden type="text"  display="none" name="id1" value="{{id1}}"> <!-- hidden  -->
     <input hidden type="text"  display="none" name="id2" value="{{id2}}"> <!-- hidden  -->
 
@@ -242,6 +243,8 @@
     <input hidden type="text"  display="none" name="nem2" value="{{nem2}}"> <!-- hidden  -->
     <input hidden type="text"  display="none" name="voltaj1" value="{{voltaj1}}"> <!-- hidden  -->
     <input hidden type="text"  display="none" name="voltaj2" value="{{voltaj2}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="tarih1" value="{{tarih1}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="tarih2" value="{{tarih2}}"> <!-- hidden  -->
     <input type="submit" class="btn btn-success" value="Excel" >
   </form>
 

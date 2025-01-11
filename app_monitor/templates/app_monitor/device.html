@@ -102,7 +102,7 @@
             <b>{{device_name.capitalize}} KAYITLARI </b> <br>
             <b>Kayıtlar: {{kayit_araligi}} </b> / <b>Sıcaklık: {{sicaklik1}} -- {{sicaklik2}} </b>  
             /<b>Nem: {{nem1}} -- {{nem2}} </b>/<b>Voltaj: {{voltaj1}} -- {{voltaj2}} </b><br>
-            <b>Tarih: {{tarih1}} -- {{tarih2}} </b>
+            <b>Tarih: {{tarih1_formatli}} -- {{tarih2_formatli}} </b>
             <br>
             <b>Kayıt Sayısı: {{kayit_sayisi_filter}} {{device_search_count}}</b> <br> <!--  gelen fonksiyona göre kayıt sayılarından biri aktif olur (deviceView veya device_filter_*****) -->
             <b>Device ID: {{device_id_dizi}} </b> <br> <!--  gelen fonksiyona göre kayıt sayılarından biri aktif olur (deviceView veya device_filter_*****) -->
@@ -214,18 +214,18 @@
   <div class="pagination col-sm-4 offset-sm-1 ">
     <span class="step-links">
         {% if devicePaginator.has_previous %}
-            <a href="?page=1&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}">&laquo; first</a>
-            <a href="?page={{ devicePaginator.previous_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">previous</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
+            <a href="?page=1&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}&tarih1={{tarih1}}&tarih2={{tarih2}}">&laquo; İlk</a>
+            <a href="?page={{ devicePaginator.previous_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}&tarih1={{tarih1}}&tarih2={{tarih2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">Önceki</a> {#paginatorda previous basınca arama-search sorgusu yoksa tek get sorgusu ile sonuçlandırır,test edelim.#}
   
         {% endif %}
   
         <span class="current">
-            Page {{ devicePaginator.number }} of {{ devicePaginator.paginator.num_pages }}.
+            Sayfa {{ devicePaginator.number }} of {{ devicePaginator.paginator.num_pages }}.
         </span>
   
         {% if devicePaginator.has_next %}
-            <a href="?page={{ devicePaginator.next_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">next</a>
-            <a href="?page={{ devicePaginator.paginator.num_pages }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}">last &raquo;</a>
+            <a href="?page={{ devicePaginator.next_page_number }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}&tarih1={{tarih1}}&tarih2={{tarih2}}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}">Sonraki</a>
+            <a href="?page={{ devicePaginator.paginator.num_pages }}&cihazadi={{device_name}}&id1={{id1}}&id2={{id2}}&sicaklik1={{sicaklik1}}&sicaklik2={{sicaklik2}}&nem1={{nem1}}&nem2={{nem2}}&voltaj1={{voltaj1}}&voltaj2={{voltaj2}}&tarih1={{tarih1}}&tarih2={{tarih2}}">Son &raquo;</a>
         {% endif %}
     </span>
   </div> <!-- paginator col  -->
@@ -242,6 +242,8 @@
     <input hidden type="text"  display="none" name="nem2" value="{{nem2}}"> <!-- hidden  -->
     <input hidden type="text"  display="none" name="voltaj1" value="{{voltaj1}}"> <!-- hidden  -->
     <input hidden type="text"  display="none" name="voltaj2" value="{{voltaj2}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="tarih1" value="{{tarih1}}"> <!-- hidden  -->
+    <input hidden type="text"  display="none" name="tarih2" value="{{tarih2}}"> <!-- hidden 250105 eklendi --> 
     <input type="submit" class="btn btn-success" value="Excel" >
   </form>
 

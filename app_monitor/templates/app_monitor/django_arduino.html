@@ -22,6 +22,11 @@
     $("#cihazid-buton-ayarla").addClass('d-none');
     $("#cihazadi-buton-ayarla").addClass('d-none');
   }  
+  function cihazAdiIptal(){
+    $("#tr-adi-duzenle").addClass('d-none');
+    $("#cihazid-buton-ayarla").removeClass('d-none');
+    $("#cihazadi-buton-ayarla").removeClass('d-none');
+  }  
 
   function cihazAdiAyarla(){
     yeni_cihaz_adi=document.getElementById("cihaz-adi-ayarla").value;
@@ -63,6 +68,11 @@
     $("#tr-id-duzenle").removeClass('d-none');
     $("#cihazid-buton-ayarla").addClass('d-none');
     $("#cihazadi-buton-ayarla").addClass('d-none');
+  }
+  function cihazIdIptal(){
+    $("#tr-id-duzenle").addClass('d-none');
+    $("#cihazid-buton-ayarla").removeClass('d-none');
+    $("#cihazadi-buton-ayarla").removeClass('d-none');
   }
 
   function cihazIdAyarla(){
@@ -256,7 +266,8 @@
     
       <input type="text" id="cihaz-id-ayarla"></td>
       <td>
-      <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdAyarla()" >Gönder</button>      
+      <button id="cihazid-buton" class="btn btn-primary btn-sm me-2" onclick="cihazIdAyarla()" >Gönder</button>      
+      <button id="cihazid-buton" class="btn btn-primary btn-sm" onclick="cihazIdIptal()" >Iptal</button>      
     </td>
   </tr> 
   <tr>
@@ -271,7 +282,8 @@
     <td>Cihaz Adı Düzenle</td>
     <td id="cihaz-adi-duzenle">
       <input type="text" id="cihaz-adi-ayarla">
-      <button id="cihazadi-buton" class="btn btn-primary btn-sm" onclick="cihazAdiAyarla()">Gönder</button>      
+      <button id="cihazadi-buton" class="btn btn-primary btn-sm me-2" onclick="cihazAdiAyarla()">Gönder</button>      
+      <button id="cihazadi-buton" class="btn btn-primary btn-sm" onclick="cihazAdiIptal()">Iptal</button>      
     </td>
   </tr>
   <tr>

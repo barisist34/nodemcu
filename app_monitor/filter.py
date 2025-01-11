@@ -121,30 +121,36 @@ def filter_device_name(request):
     print(f"tarih1 tipi: {type(tarih1)}")
     print(f"tarih1: {tarih1}")
     #2024-11-12 22:40:06.395707   '%Y-'
-    if (tarih1!="" or None) and (tarih2!="" or None): 
+    tarih1_formatli=""
+    tarih2_formatli=""
+    if (tarih1!="" ): 
         tarih1_datetime=datetime.strptime(tarih1,'%Y-%m-%dT%H:%M') #string-datetime
-        tarih1=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        tarih1_formatli=datetime.strftime(tarih1_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+    if (tarih2!=""):
         tarih2_datetime=datetime.strptime(tarih2,'%Y-%m-%dT%H:%M') #string-datetime
-        tarih2=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
+        tarih2_formatli=datetime.strftime(tarih2_datetime,'%Y-%m-%d %H:%M') #datetime format değiştirme
         # tarih1_datetime=datetime.date(tarih1)
         # print(f"tarih1_datetime tipi: {type(tarih1_datetime)}")
     if (tarih1=="" or None) and (tarih2=="" or None): 
         filter_result_tarih=filter_result_voltaj.filter(
-            date__gte=datetime(2023,12,30),date__lte=datetime.now()
+            date__gte=datetime(2023,12,30),date__lte=datetime.now() # EN AZ 1 YILLIK KAYIT
             ).filter(device_name__iexact=cihazadi).order_by('-id')
         print(f"tarih kontrolu:tarih1=="" or None) and (tarih2=="" or None ")
         print(f"tarih sayısı none-none: {filter_result_tarih.count()}") 
     elif tarih1=="" or None: 
         filter_result_tarih=filter_result_voltaj.filter(
-            date__lte=tarih2
+            date__lte=tarih2_datetime
+            # date__lte=tarih2
             ).filter(device_name__iexact=cihazadi).order_by('-id')
     elif tarih2=="" or None:
         filter_result_tarih=filter_result_voltaj.filter(
-            date__gte=tarih1
+            date__gte=tarih1_datetime
+            # date__gte=tarih1
             ).filter(device_name__iexact=cihazadi).order_by('-id')
     else:
         filter_result_tarih=filter_result_voltaj.filter(
-                date__gte=tarih1,date__lte=tarih2
+                date__gte=tarih1_datetime,date__lte=tarih2_datetime
+                # date__gte=tarih1,date__lte=tarih2
                 ).filter(device_name__iexact=cihazadi).order_by('-id')    
         print(f"tarih sayısı: {filter_result_tarih.count()}")
         print(f"voltaj sayısı: {filter_result_voltaj.count()}")
@@ -171,6 +177,8 @@ def filter_device_name(request):
         voltaj2=voltaj2,
         tarih1=tarih1,
         tarih2=tarih2,
+        tarih1_formatli=tarih1_formatli,
+        tarih2_formatli=tarih2_formatli,
         device_name=cihazadi,
         devicePaginator=devicePaginator,
         kayit_sayisi_filter=kayit_sayisi_filter,
