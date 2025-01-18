@@ -12,6 +12,9 @@
        <th scope="col">Nem</th>
        <th scope="col">Voltaj</th>
        <th scope="col">Tarih</th>
+       <th scope="col">Çıkış1</th>
+       <th scope="col">Çıkış2</th>
+       <th scope="col">Etiket</th>
        <th scope="col">Açıklama</th>
      </tr>
    </thead>
@@ -41,6 +44,9 @@
      <td >{{temp.volcum}}</td>
      <!--  <td> {{temp.date}}</td>  ilk hali saniyesiz --> 
      <td > {{temp.date|date:'Y-m-d H:i:s'}}</td> <!--  -->  
+     <td > {{temp.cikis1}}</td> <!--  -->  
+     <td > {{temp.cikis2}}</td> <!--  -->  
+     <td > {{temp.staff_name}}--{{temp.tag_id}} </td> <!--  -->  
      <td >
       {% comment %} <button type="button" data-bs-toggle="modal" data-bs-target="#modal1" data-bs-toggle="modal">...</button> {% endcomment %}
       <button type="button" data-bs-toggle="modal" data-bs-target="#modal{{temp.id}}" data-bs-toggle="modal">...</button>

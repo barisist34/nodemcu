@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Temperature,Device,Alarm,Event
+from .models import Temperature,Device,Alarm,Event,RFID_Kisi,RFID_Etiket
 
 @admin.register(Temperature)
 class TemperatureAdmin(admin.ModelAdmin):
@@ -9,6 +9,9 @@ class TemperatureAdmin(admin.ModelAdmin):
         'date',
         'mail',
         'cikis1',
+        'cikis2',
+        'tag_id',
+        'staff_name',
     ]
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
@@ -18,6 +21,22 @@ class DeviceAdmin(admin.ModelAdmin):
         'device_ip',
         'device_port',
         'device_function',
+    ]
+@admin.register(RFID_Kisi)
+class DeviceAdmin(admin.ModelAdmin):
+    list_display=[
+        'pk',
+        'tag_id',
+        'staff_name',
+    ]
+@admin.register(RFID_Etiket)
+class DeviceAdmin(admin.ModelAdmin):
+    list_display=[
+        'pk',
+        'tag_id',
+        'staff_name',
+        'cikis3',
+        'date',
     ]
 @admin.register(Alarm)
 class AlarmAdmin(admin.ModelAdmin):

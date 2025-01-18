@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse,redirect
-from .models import Temperature,Device,Alarm,Event
+from .models import Temperature,Device,Alarm,Event,RFID_Kisi,RFID_Etiket
 from django.views.decorators.csrf import csrf_exempt,requires_csrf_token
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -100,19 +100,27 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         volcum = request.GET.get("volcum") #voltaj degeri
         device_name=request.GET.get("device_name")
         cikis1=request.GET.get("cikis1")
+        cikis2=request.GET.get("cikis2")
+        etiket=request.GET.get("etiket") #250117
         print(f"Entry.DoesNotExist......??: {Device.objects.filter(device_id=3)}")
         # if not Device.objects.filter(device_name__icontains=device_name).exists():
-        if not Device.objects.filter(device_name__iexact=device_name).exists():
-            # temp = Temperature.objects.filter(device_name__iexact=cihazadi) #iexact kullanıldı exact değil
-            print(f" {device_name}:  device_id database de olmayan blok girdi... ")
-            device_id_request=request.GET.get("device_id")
-            device_ip_request=request.GET.get("device_ip")
-            device_port_request=request.GET.get("device_port")            
-            new_device=Device(device_id=device_id_request,device_name=device_name,device_port=device_port_request,device_ip=device_ip_request)
-            new_device.save()
-            print(f"new_device: {new_device}")
-            print(f"new device name: {new_device.device_name}")
+        # if not Device.objects.filter(device_name__iexact=device_name).exists(): # aşağıda device_id için yeni device oluştuğu için buraya gerek yok.
+        #     # temp = Temperature.objects.filter(device_name__iexact=cihazadi) #iexact kullanıldı exact değil
+        #     print(f" {device_name}:  device_id database de olmayan blok girdi... ")
+        #     device_id_request=request.GET.get("device_id")
+        #     device_ip_request=request.GET.get("device_ip")
+        #     device_port_request=request.GET.get("device_port")            
+        #     new_device=Device(device_id=device_id_request,device_name=device_name,device_port=device_port_request,device_ip=device_ip_request)
+        #     new_device.save()
+        #     print(f"new_device: {new_device}")
+        #     print(f"new device name: {new_device.device_name}")
 
+        try:
+            tag_id_request=RFID_Kisi.objects.get(tag_id=etiket)
+            staff_name_request=tag_id_request.staff_name
+        except:
+            tag_id_request=None
+            staff_name_request=None
         device_id_request=request.GET.get("device_id")
         if not Device.objects.filter(device_id=device_id_request).exists():
             print(f" {device_id_request}:  device_id database de olmayan blok girdi... ")
@@ -135,7 +143,7 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
         
         print(f"kayit: {kayit} - device_name: {device_name}")
 
-        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now(),cikis1=cikis1) #241013
+        newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name,device_id=device_id, date=timezone.now(),cikis1=cikis1,cikis2=cikis2,tag_id=tag_id_request,staff_name=staff_name_request) #241013
         newRecord.save()
         # newRecord = Temperature(temperature=kayit,humidity=humidity ,volcum=volcum,device_name=device_name, date=timezone.now())
     else:
@@ -160,6 +168,17 @@ def addRecordArduino(request): # yeni sıcaklık kaydı ekleme,form get metoduyl
     )
     # return render(request, 'app_monitor/temperature_ajax.html', context)
     return redirect('/app_monitor')
+
+def addRecordRfid(request): #250116
+    etiket=request.GET.get("etiket")
+    cikis3=request.GET.get("cikis_3")
+    tag_id_kisi=RFID_Kisi.objects.get(tag_id=etiket)
+    date=timezone.now()
+
+    new_record=RFID_Etiket(tag_id=tag_id_kisi,staff_name=tag_id_kisi.staff_name,cikis3=cikis3,date=date)
+    new_record.save()
+
+    return HttpResponse(f"Son Kayıt: {new_record}")
 
 # GIT commit 240921-2
 # @csrf_exempt
@@ -796,19 +815,31 @@ def arduino_serial_local(request,config_parameter):
         print(f"all serial ports: {all_serial_ports}")
         # try:
         value_dict=json.loads(value)
-        context=dict(
-        value=value,
-        device_id=value_dict['CihazId'],
-        device_name=value_dict['CihazAdi'],
-        device_port=value_dict['CihazPort'],
-        device_ip=value_dict['CihazIp'],
-        server_ip=value_dict['ServerIp'],
-        device_ssid=value_dict['CihazSSID'],
-        device_password=value_dict['CihazPassword'],
-        ag_gecidi=value_dict['AgGecidi'],
-        myports=myports,
-        port_listesi=port_listesi,
-        )
+        if json.loads(value) == "":
+            context=dict(
+            device_id="tekrar deneyiniz",
+            device_name="tekrar deneyiniz",
+            device_port="tekrar deneyiniz",
+            device_ip="tekrar deneyiniz",
+            server_ip="tekrar deneyiniz",
+            device_ssid="tekrar deneyiniz",
+            device_password="tekrar deneyiniz",
+            ag_gecidi="tekrar deneyiniz",
+            )
+        else:    
+            context=dict(
+            value=value,
+            device_id=value_dict['CihazId'],
+            device_name=value_dict['CihazAdi'],
+            device_port=value_dict['CihazPort'],
+            device_ip=value_dict['CihazIp'],
+            server_ip=value_dict['ServerIp'],
+            device_ssid=value_dict['CihazSSID'],
+            device_password=value_dict['CihazPassword'],
+            ag_gecidi=value_dict['AgGecidi'],
+            myports=myports,
+            port_listesi=port_listesi,
+            )
         # except:
         #     context=dict(
         #     value="USB Portu kontrol ediniz",
@@ -948,30 +979,35 @@ def write_read(config_parameter):
     an=datetime.now()
     datetime_send=datetime.strftime(an,'%c')
     print(f"write_read_all girdi...")
-# try:
-    # comport="COM5"
-    comport=list(serial.tools.list_ports.comports())[0][0]
-    print(f"comport: {comport}")
-    # arduino = serial.Serial(port=comport,  baudrate=115200, timeout=1)
-    arduino = serial.Serial(port=comport,  baudrate=9600, timeout=.5,stopbits=serial.STOPBITS_ONE)
-    print(f"arduino: {arduino}")
-    an=datetime.now()
-    datetime_send=datetime.strftime(an,'%c')
-    # print(f"datetimesen tipi: {type(datetime_send)}")
-    # if config_parameter == "all":
-    arduino.write(bytes("all",  'utf-8')) #butun config göster
-    # arduino.write(bytes("asd",  'utf-8')) #butun config göster
-    print("arduino.write all parametresiyle çalıştı,alt satırı burası...")
-    time.sleep(0.05)
-    time.sleep(3)
-    data = arduino.readline().decode('utf_8')
-    print(f"arduino.readline():{data}")
-    arduino.close()  ##### CLOSE() yapılmazsa bazen hata alınıyor.......Expecting value: line 1 column 1 (char 0)
-    return  data
-# except :
-    print("FileNotFoundError exception oluştu")
-    # arduino.close() #241117
-    return "Exception Hata..."
+    try:
+        # comport="COM5"
+        comport=list(serial.tools.list_ports.comports())[0][0]
+        print(f"comport: {comport}")
+        # arduino = serial.Serial(port=comport,  baudrate=115200, timeout=1)
+        arduino = serial.Serial(port=comport,  baudrate=9600, timeout=1,stopbits=serial.STOPBITS_ONE)
+        print(f"arduino: {arduino}")
+        an=datetime.now()
+        datetime_send=datetime.strftime(an,'%c')
+        # print(f"datetimesen tipi: {type(datetime_send)}")
+        # if config_parameter == "all":
+        arduino.reset_input_buffer()
+        arduino.reset_output_buffer()
+        write_sayi=arduino.write(bytes("all",  'utf-8')) #butun config göster
+        # arduino.write(bytes("v",  'utf-8')) #butun config göster
+        # arduino.write(bytes("asd",  'utf-8')) #butun config göster
+        print(f"arduino.write: {write_sayi}")
+        # time.sleep(0.05)
+        time.sleep(1)
+        # data = arduino.read(5)
+        data = arduino.readline().decode('utf_8')
+        print(f"arduino.readline():{data}, type: {type(data)}")
+        # arduino.close()  ##### CLOSE() yapılmazsa bazen hata alınıyor.......Expecting value: line 1 column 1 (char 0)
+        return  data
+    except :
+        print("write_read all parametresinde except oluştu")
+        # arduino.close() #241117
+        # return "write_read all parametresinde except oluştu..."
+        return "{\"CihazId\":\"x\",\"CihazAdi\":\"x\",\"CihazPort\":\"x\",\"CihazIp\":\"x\",\"ServerIp\":\"x\",\"AgGecidi\":\"x\",\"CihazSSID\":\"x\",\"CihazPassword\":\"x\"}"
     # raise Exception("COM portu yanlış giriyorsunuz...")
 
 def write_read_id(id):
@@ -993,7 +1029,7 @@ def write_read_id(id):
         time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
-        arduino.close()
+        # arduino.close()
         return  data
         # return arduino_write_str
         # return arduino_write_dumps
@@ -1147,7 +1183,7 @@ def write_read_ssid(ssid):
         arduino_write_dumps=json.dumps(arduino_write)
         print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
         arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
-        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        time.sleep(1)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
         return  data
@@ -1169,7 +1205,7 @@ def write_read_password(password):
         arduino_write_dumps=json.dumps(arduino_write)
         print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
         arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
-        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        time.sleep(1)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
         return  data
@@ -1191,10 +1227,10 @@ def write_read_cihazport(cihazport):
         arduino_write_dumps=json.dumps(arduino_write)
         print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
         arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
-        time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+        time.sleep(1)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
         data = arduino.readline().decode('utf_8')
         print(f"arduino.readline():{data}")
-        arduino.close()
+        # arduino.close()
         return  data
     except :
         print("FileNotFoundError exception oluştu")
@@ -1208,7 +1244,7 @@ def write_read_reset():
     arduino_write_dumps=json.dumps(arduino_write)
     print(f"arduino_write_dumps:{arduino_write_dumps}, type:{type(arduino_write_dumps)}")
     arduino.write(bytes(arduino_write_dumps,  'utf-8')) #butun config göster
-    time.sleep(3)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
+    time.sleep(1)    ######## BU SATIR OLMAZSA KESINLIKLE HATA VERIYOR!!!!!!!!!!!!!!!!!!!!!!!
     data = arduino.readline().decode('utf_8')
     print(f"arduino.readline():{data}")
     return  data  

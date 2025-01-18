@@ -1,0 +1,38 @@
+
+arduino value: {"device_id":,"device_port":90}
+, type: <class 'str'>
+
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+192.168.43.130>        <input type=
+1 
+arduino_write_dumps:
+
+{"id": "3"}
+
+{"name": "Cihaz5"}
+
+{"ssid": "barisuyar"}
+
+{"SSID": "ZyXEL_4500"}
+
+{"password": "7ilp7oT4be444"}
+
+{"password": "rwrf0860"}
+
+{"password": "123456789"} 
+
+{"password": "123456789012345678"} 
+
+{"password": "123"}
+
+
+{"reset": "reset"}
+
+{"cihazport": "93"}
+
+{"cihazip": "192.168.1.43", "cihazip_3": "43", "cihazip_2": "1", "cihazip_1": "168", "cihazip_0": "192"}
+
+{"serverip": "192.168.1.35", "serverip_3": "35", "serverip_2": "1", "serverip_1": "168", "serverip_0": "192"}
+
+{"gatewayip": "192.168.1.1", "gatewayip_3": "1", "gatewayip_2": "1", "gatewayip_1": "168", "gatewayip_0": "192"}

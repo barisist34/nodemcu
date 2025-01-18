@@ -14,6 +14,26 @@ class Device(models.Model):
     def __str__(self):
         return(f"{self.device_id}")
 
+class RFID_Kisi(models.Model):
+    id=models.IntegerField(primary_key=True,db_column='ID')
+    tag_id=models.CharField(blank=True,null=True, max_length=20)
+    staff_name=models.CharField(blank=True,null=True, max_length=30)
+
+    def __str__(self):
+        return f"{self.tag_id}"
+
+
+class RFID_Etiket(models.Model):
+    id=models.IntegerField(primary_key=True,db_column='ID')
+    tag_id=models.ForeignKey(RFID_Kisi,on_delete=models.CASCADE,null=True,blank=True)
+    staff_name=models.CharField(blank=True,null=True, max_length=30)
+    cikis3=models.CharField(blank=True,null=True, max_length=5)
+    date=models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.staff_name}--{self.tag_id}"
+
+
 class Temperature(models.Model):
     id=models.BigAutoField(primary_key=True,db_column='ID')
     temperature=models.FloatField(blank=True,null=True)
@@ -27,6 +47,8 @@ class Temperature(models.Model):
     device_name=models.CharField(blank=True,null=True, max_length=50)
     cikis1=models.CharField(blank=True,null=True, max_length=5)
     cikis2=models.CharField(blank=True,null=True, max_length=5)
+    tag_id=models.ForeignKey(RFID_Kisi,on_delete=models.CASCADE,null=True,blank=True)
+    staff_name=models.CharField(blank=True,null=True, max_length=30)
     # device_name=models.ForeignKey(Device,on_delete=models.CASCADE,null=True, blank=True)
 
     def __str__(self):

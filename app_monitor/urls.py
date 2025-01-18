@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,tempList,deviceView,exportExcel,export_to_excel
+from app_monitor.views import dashboard,TemperatureAddRecord,addRecordArduino,addRecordRfid,tempList,deviceView,exportExcel,export_to_excel
 from app_monitor.views import django_device,django_device_backtest,deviceViewDetail,export_to_excel_all,devices_all
 from app_monitor.views import device_id,export_to_excel_id,arduino_serial_local,additional_text,additional_text_sil,export_to_excel_serial_query
 from app_monitor.views import cron_task,scheduler_cihaz,event_list_view,export_to_excel_event_all,export_to_excel_serial_query_deviceid
@@ -24,6 +24,7 @@ urlpatterns=[
 
     # path('TemperatureAddRecord',TemperatureAddRecord,name="TemperatureAddRecord"),
     path('addRecordArduino',addRecordArduino,name="addRecordArduino"),
+    path('addRecordRfid',addRecordRfid,name="addRecordRfid"),
     path('exportExcel',exportExcel,name="exportExcel"),
     path('export_to_excel_serial_query',export_to_excel_serial_query,name="export_to_excel_serial_query"),
     path('export_to_excel_serial_query_deviceid',export_to_excel_serial_query_deviceid,name="export_to_excel_serial_query_deviceid"),
